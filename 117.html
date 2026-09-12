@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>免試入學同分比序與會考分析 (整合頁)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* 陽明國中配色方案與基礎設定 */
+        :root {
+            --ym-blue: #3B5998;
+            --ym-green: #92C83E;
+            --ym-blue-dark: #2d4373;
+            --ym-gray: #64748b;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .section-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--ym-gray);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--ym-blue-dark);
+            margin-bottom: 2rem;
+        }
+
+        /* 流程圖專用樣式 */
+        .flowchart-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr auto);
+            grid-template-rows: repeat(4, auto);
+            gap: 1.5rem 1rem;
+            width: 96vw;
+            max-width: 1800px;
+            align-items: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .flowchart-item {
+            background-color: #eef2ff;
+            border: 3px solid #c7d2fe;
+            border-radius: 0.75rem;
+            padding: 1.5rem 1rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ym-blue-dark);
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            text-align: center;
+            line-height: 1.4;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .flowchart-arrow {
+            font-size: 3rem;
+            color: #a5b4fc;
+            text-align: center;
+            font-weight: 900;
+        }
+
+        .flowchart-arrow:nth-child(10n) {
+            visibility: hidden;
+        }
+
+        .clickable-item {
+            cursor: pointer;
+            border-color: #f87171 !important;
+            background-color: #fee2e2 !important;
+            color: #b91c1c !important;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .clickable-item:hover {
+            transform: scale(1.05);
+        }
+
+        .bubble {
+            position: absolute;
+            background-color: #1e293b;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            width: 400px;
+            font-size: 1.25rem;
+            line-height: 1.6;
+            text-align: left;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.95);
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
+            pointer-events: none;
+        }
+
+        .bubble.show-bubble {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            border-style: solid;
+        }
+
+        .top-bubble {
+            bottom: 115%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+        }
+
+        .top-bubble.show-bubble {
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .top-bubble::after {
+            top: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-color: #1e293b transparent transparent transparent;
+        }
+
+        .bottom-bubble {
+            top: 115%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px) scale(0.95);
+        }
+
+        .bottom-bubble.show-bubble {
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .bottom-bubble::after {
+            bottom: 100%;
+            left: 50%;
+            margin-left: -8px;
+            border-width: 8px;
+            border-color: transparent transparent #1e293b transparent;
+        }
+
+        /* 分析表格樣式 */
+        .analysis-table {
+            width: 100%;
+            max-width: 900px;
+            border-collapse: collapse;
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .analysis-table th,
+        .analysis-table td {
+            border: 2px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+        }
+
+        .analysis-table th {
+            font-weight: 700;
+        }
+
+        .level-a-plus-plus {
+            color: #d946ef;
+        }
+
+        .level-a-plus {
+            color: #9333ea;
+        }
+
+        .level-a {
+            color: #4f46e5;
+        }
+
+        .step-hidden {
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .step-revealed {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body class="py-8 px-4 min-h-screen cursor-pointer select-none flex flex-col justify-center items-center">
+
+    <!-- 全螢幕按鈕 -->
+    <button id="fullscreenBtn" class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-[0_4px_15px_rgba(0,0,0,0.2)] border-2 border-slate-100 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:scale-110 transition-all duration-200" title="切換全螢幕">
+        <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l5-5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+    </button>
+
+    <main class="w-full flex flex-col items-center justify-center">
+
+        <!-- 第 21 頁內容：同分比序 (新) -->
+        <section class="w-full flex flex-col items-center relative" id="new-flowchart-card">
+           <h2 class="feature-title !text-5xl !mb-6">117年高雄區免試入學同分比序流程</h2>
+            
+            <p class="text-blue-600 font-bold mb-10 animate-pulse text-2xl">💡 請點擊畫面任意處以進行下一步</p>
+
+            <div class="flowchart-container" id="flowchart-container-new">
+                <!-- JS 會自動生成此處內容 -->
+            </div>
+            
+            <p class="mt-8 text-slate-500 text-2xl font-medium">點擊<span class="font-bold text-red-600 mx-2">紅色區塊</span>可查看變動說明</p>
+        </section>
+
+    </main>
+
+    <script>
+        // 117年正式比序流程
+        const newFlowchartData = [
+            '總積分 (100分)', '多元發展項目<br>總積分 (40分)', '志願序積分 (30分)', '國中教育會考<br>總積分 (30分)', '國中教育會考<br>總積點 (36點)',
+            '國中教育會考<br>國文積分 (6分)', '國中教育會考<br>數學積分 (6分)', '國中教育會考<br>英語積分 (6分)', '國中教育會考<br>社會積分 (6分)', '國中教育會考<br>自然積分 (6分)',
+            '國中教育會考<br>國文積點 (7點)', '國中教育會考<br>數學積點 (7點)', '國中教育會考<br>英語積點 (7點)', '國中教育會考<br>社會積點 (7點)', '國中教育會考<br>自然積點 (7點)',
+            '國中教育會考<br>寫作級分 (6級分)', '經濟弱勢<br>保障', '同志願群<br>優先志願', '增額'
+        ];
+
+        let revealGroups = [];
+        let currentStep = 0;
+
+        function generateNewFlowchart() {
+            const container = document.getElementById('flowchart-container-new');
+            if (!container) return;
+            container.innerHTML = '';
+            revealGroups = [];
+            currentStep = 0;
+
+            newFlowchartData.forEach((text, index) => {
+                let currentGroup = [];
+                
+                // 1. 如果不是第一個項目，先加入連接箭頭
+                if (index > 0) {
+                    if (index % 5 !== 0) { // 同一列的箭頭
+                        const arrow = document.createElement('div');
+                        arrow.className = 'flowchart-arrow step-hidden';
+                        arrow.innerHTML = '→';
+                        container.appendChild(arrow);
+                        currentGroup.push(arrow);
+                    } else { // 換列時加入隱形的佔位箭頭以維持版面
+                        const empty = document.createElement('div');
+                        empty.className = 'flowchart-arrow';
+                        container.appendChild(empty);
+                    }
+                }
+
+                // 2. 加入流程圖項目本身
+                const item = document.createElement('div');
+                item.className = 'flowchart-item step-hidden';
+                item.innerHTML = text;
+
+                // 注入氣泡內容 (總積點 36點)
+                if (index === 4) {
+                    item.classList.add('clickable-item');
+                    item.innerHTML += `<div class="bubble top-bubble">寫作測驗成績(最高1點)改為計點後，納入總積點計算，因此滿點從35點提升為36點。<br><br><strong class='text-amber-300'>寫作測驗級分與點數對照：</strong><div class="mt-2 grid grid-cols-2 gap-x-4"><div>5級分：0.8點</div><div>6級分：1點</div><div>4級分：0.6點</div><div>3級分：0.4點</div><div>2級分：0.2點</div><div>1級分：0.1點</div></div></div>`;
+                }
+
+                container.appendChild(item);
+                currentGroup.push(item);
+                
+                // 將該箭頭與步驟綑綁在同一個群組，點擊時會一起顯示
+                revealGroups.push(currentGroup);
+            });
+
+            // 綁定氣泡點擊事件
+            container.querySelectorAll('.clickable-item').forEach(clickable => {
+                clickable.addEventListener('click', (e) => {
+                    e.stopPropagation(); // 阻止事件冒泡到 document，避免意外觸發「下一步」
+                    const bubble = clickable.querySelector('.bubble');
+                    if (bubble) {
+                        const isVisible = bubble.classList.contains('show-bubble');
+                        // 先隱藏所有氣泡
+                        container.querySelectorAll('.bubble.show-bubble').forEach(b => b.classList.remove('show-bubble'));
+                        // 切換當前點擊的氣泡狀態
+                        if (!isVisible) {
+                            bubble.classList.add('show-bubble');
+                        }
+                    }
+                });
+            });
+
+            // 已根據需求移除畫面載入自動顯示第一步的邏輯，現在第一次點擊才會顯示第一步
+        }
+
+        // 點擊畫面任意處時，隱藏氣泡並進行下一步
+        document.addEventListener('click', (e) => {
+            // 點擊畫面時先隱藏所有打開的氣泡
+            document.querySelectorAll('.bubble.show-bubble').forEach(b => b.classList.remove('show-bubble'));
+
+            // 進行下一步的動畫
+            if (currentStep < revealGroups.length) {
+                revealGroups[currentStep].forEach(el => {
+                    el.classList.remove('step-hidden');
+                    el.classList.add('step-revealed');
+                });
+                currentStep++;
+            }
+        });
+
+        // 頁面載入後自動產生流程圖
+        document.addEventListener('DOMContentLoaded', generateNewFlowchart);
+
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const fsIcon = document.getElementById('fullscreen-icon');
+
+        fullscreenBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 阻止冒泡，避免觸發下一步
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.warn(`無法進入全螢幕模式: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        });
+
+        // 監聽全螢幕狀態改變以切換圖示
+        document.addEventListener('fullscreenchange', () => {
+            if (document.fullscreenElement) {
+                // 進入全螢幕：顯示縮小圖示
+                fsIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 14h6m0 0v6m0-6l-7 7m17-11h-6m0 0V4m0 6l7-7M4 10h6m0 0V4m0 6l-7-7m17 11h-6m0 0v6m0-6l7 7" />`;
+            } else {
+                // 退出全螢幕：顯示放大圖示
+                fsIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />`;
+            }
+        });
+    </script>
+</body>
+
+</html>
