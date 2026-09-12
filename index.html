@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>116學年度高雄區免試入學落點預測｜我的成績 → 歷史落點 → 提升一級 → 新增志願</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* =========================
+   DESIGN TOKENS
+========================= */
+:root{
+  --ink:#1A1E33;
+  --ink-soft:#565C79;
+  --hairline:#DDE0EC;
+  --paper:#F3F4FA;
+  --surface:#FFFFFF;
+  --indigo:#1E2A6E;
+  --indigo-deep:#141B4D;
+  --indigo-soft:#3E4A9C;
+  --indigo-tint:#EBEDF9;
+  --teal:#0B8F82;
+  --teal-tint:#E1F5F1;
+  --orange:#D97B29;
+  --orange-tint:#FBEEDE;
+  --gray-gap:#8A8FA3;
+  --gray-tint:#EDEEF4;
+  --redsoft:#C15B4A;
+  --redsoft-tint:#F8E9E6;
+  --radius-l:22px;
+  --radius-m:14px;
+  --radius-s:9px;
+  --shadow-1:0 2px 10px rgba(20,27,77,.06);
+  --shadow-2:0 10px 30px rgba(20,27,77,.10);
+  --serif:'Noto Serif TC', 'PingFang TC', 'Microsoft JhengHei', serif;
+  --sans:'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%;}
+a{color:var(--indigo-soft);}
+button{font-family:inherit;}
+:focus-visible{outline:3px solid var(--indigo-soft); outline-offset:2px;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px;}
+@media (max-width:640px){.wrap{padding:0 14px;}}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* =========================
+   HERO / HEADER
+========================= */
+.hero{
+  background:linear-gradient(155deg,var(--indigo-deep) 0%,var(--indigo) 62%,var(--indigo-soft) 100%);
+  color:#F4F5FC;
+  padding:44px 0 56px;
+  position:relative;
+  overflow:hidden;
+}
+.hero::after{
+  content:"";
+  position:absolute; right:-120px; top:-160px;
+  width:420px; height:420px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);
+}
+.hero-kicker{
+  font-size:.92rem; color:#C9CFEF; margin:0 0 10px; font-weight:500;
+}
+.hero h1{
+  font-family:var(--serif);
+  font-weight:900;
+  font-size:clamp(1.8rem,4.4vw,2.7rem);
+  line-height:1.28;
+  margin:0 0 14px;
+  max-width:15ch;
+}
+.hero p.sub{
+  font-size:1.02rem;
+  color:#DEE1F5;
+  max-width:46ch;
+  margin:0 0 8px;
+}
+.hero p.tag{
+  font-family:var(--serif);
+  font-weight:700;
+  font-size:1.15rem;
+  color:#9FE8DC;
+  margin:18px 0 0;
+}
+.writing-note{
+  margin-top:22px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:var(--radius-m);
+  padding:12px 16px;
+  font-size:.88rem;
+  color:#E9EBF9;
+  max-width:640px;
+}
+
+/* =========================
+   LAYOUT: MAIN GRID
+========================= */
+main{padding:34px 0 60px;}
+.section{margin-bottom:46px;}
+.section-head{margin-bottom:18px;}
+.section-head h2{
+  font-family:var(--serif);
+  font-size:clamp(1.25rem,2.6vw,1.6rem);
+  margin:0 0 6px;
+  color:var(--indigo-deep);
+}
+.section-head p{margin:0; color:var(--ink-soft); font-size:.94rem;}
+
+.top-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:22px;
+}
+@media (min-width:960px){
+  .top-grid{grid-template-columns:1.15fr .85fr; align-items:start;}
+}
+
+/* =========================
+   SUBJECT INPUT
+========================= */
+.panel{
+  background:var(--surface);
+  border-radius:var(--radius-l);
+  padding:22px;
+  box-shadow:var(--shadow-1);
+  border:1px solid var(--hairline);
+}
+.panel h3{
+  font-family:var(--serif);
+  margin:0 0 4px;
+  font-size:1.2rem;
+  color:var(--indigo-deep);
+}
+.panel .hint{color:var(--ink-soft); font-size:.88rem; margin:0 0 18px;}
+
+.subject-card{
+  border:1px solid var(--hairline);
+  border-radius:var(--radius-m);
+  padding:14px 16px 16px;
+  margin-bottom:14px;
+  background:#FCFCFE;
+}
+.subject-card:last-child{margin-bottom:0;}
+.subject-card-head{
+  display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  margin-bottom:10px;
+}
+.subject-card-head .name{font-weight:700; font-size:1.05rem;}
+.subject-card-head .status{
+  font-size:.82rem; color:var(--ink-soft);
+}
+.subject-card-head .status.picked{color:var(--teal); font-weight:700;}
+.grade-grid{display:flex; flex-direction:column; gap:8px;}
+.grade-row{display:grid; gap:8px;}
+.grade-row.row1{grid-template-columns:repeat(3,1fr);}
+.grade-row.row2{grid-template-columns:repeat(4,1fr);}
+.grade-btn{
+  border:1.5px solid var(--hairline);
+  background:#fff;
+  border-radius:var(--radius-s);
+  padding:10px 4px;
+  font-size:.98rem;
+  font-weight:700;
+  color:var(--indigo-deep);
+  cursor:pointer;
+  transition:border-color .15s, background .15s, color .15s, transform .1s;
+  text-align:center;
+}
+.grade-btn:hover{border-color:var(--indigo-soft);}
+.grade-btn:active{transform:scale(.97);}
+.grade-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fff;
+}
+.grade-btn .pt{
+  display:block; font-size:.68rem; font-weight:500; margin-top:2px; opacity:.75;
+}
+
+/* =========================
+   GENDER SELECTOR
+========================= */
+.gender-selector{
+  border:none; padding:0; margin:0 0 6px; display:flex; gap:10px; flex-wrap:wrap;
+}
+.gender-selector legend{
+  font-weight:700; font-size:.95rem; margin:0 0 8px; padding:0; width:100%; color:var(--ink);
+}
+.gender-option{
+  flex:1 1 120px; min-height:52px; display:flex; align-items:center; justify-content:center; gap:8px;
+  border:1.5px solid var(--hairline); border-radius:var(--radius-m); background:#fff;
+  cursor:pointer; font-weight:700; font-size:.98rem; color:var(--indigo-deep);
+  transition:border-color .15s, background .15s, color .15s; position:relative; padding:0 10px;
+}
+.gender-option:hover{border-color:var(--indigo-soft);}
+.gender-option input{
+  position:absolute; width:1px; height:1px; opacity:0; margin:0; padding:0;
+}
+.gender-dot{
+  width:20px; height:20px; border-radius:50%; border:2px solid var(--gray-gap);
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; background:#fff;
+  transition:border-color .15s;
+}
+.gender-dot::after{
+  content:""; width:10px; height:10px; border-radius:50%; background:var(--indigo);
+  opacity:0; transform:scale(.4); transition:opacity .15s, transform .15s;
+}
+.gender-option.is-selected{background:var(--indigo-tint); border-color:var(--indigo);}
+.gender-option.is-selected .gender-dot{border-color:var(--indigo);}
+.gender-option.is-selected .gender-dot::after{opacity:1; transform:scale(1);}
+.gender-option input:focus-visible + .gender-dot{
+  outline:3px solid var(--indigo-soft); outline-offset:2px;
+}
+.gender-help{color:var(--ink-soft); font-size:.85rem; margin:0 0 16px;}
+
+.tier-note{font-size:.8rem; color:var(--ink-soft); border-top:1px dashed var(--hairline); padding-top:8px; margin-top:2px;}
+.tier-note.tier-win{color:var(--teal);}
+
+.rule-card{
+  background:var(--indigo-tint); border:1px solid #D6DAF3; border-radius:var(--radius-m);
+  padding:16px 18px; margin-bottom:16px; font-size:.9rem; color:var(--indigo-deep);
+}
+.rule-card h4{margin:0 0 8px; font-family:var(--serif); font-size:1rem;}
+.rule-card ol{margin:0 0 10px; padding-left:20px;}
+.rule-card ol li{margin-bottom:4px;}
+.rule-card .rule-key{font-weight:700; color:var(--indigo-deep);}
+.rule-card .rule-sub{color:var(--ink-soft); font-size:.82rem; margin:2px 0 0 20px;}
+
+.fivea-note{
+  margin-top:14px; padding:12px 14px; border-radius:var(--radius-m);
+  background:var(--teal-tint); color:#0A6B60; font-size:.87rem;
+}
+.fivea-note b{display:block; margin-bottom:4px;}
+
+.panel-actions{
+  display:flex; gap:10px; flex-wrap:wrap; margin-top:18px;
+}
+.btn{
+  border:none; border-radius:999px; padding:10px 18px; font-weight:700;
+  font-size:.88rem; cursor:pointer; transition:opacity .15s, transform .1s;
+}
+.btn:active{transform:scale(.97);}
+.btn-ghost{background:var(--gray-tint); color:var(--ink-soft);}
+.btn-ghost:hover{opacity:.8;}
+.btn-danger{background:var(--redsoft-tint); color:var(--redsoft);}
+.btn-danger:hover{opacity:.8;}
+.btn-primary{background:var(--indigo); color:#fff;}
+.btn-teal{background:var(--teal); color:#fff;}
+
+.incomplete-box{
+  margin-top:16px; padding:12px 14px; border-radius:var(--radius-m);
+  background:var(--orange-tint); color:#8A5316; font-size:.88rem;
+}
+.incomplete-box b{display:block; margin-bottom:4px;}
+.complete-box{
+  margin-top:16px; padding:12px 14px; border-radius:var(--radius-m);
+  background:var(--teal-tint); color:#0A6B60; font-size:.88rem;
+}
+.complete-box div{margin:2px 0;}
+
+/* =========================
+   DASHBOARD
+========================= */
+.dash-grid{
+  display:grid; grid-template-columns:repeat(2,1fr); gap:14px;
+}
+@media (min-width:500px) and (max-width:959px){
+  .dash-grid{grid-template-columns:repeat(4,1fr);}
+}
+.dash-card{
+  background:var(--surface);
+  border-radius:var(--radius-l);
+  padding:18px 16px;
+  box-shadow:var(--shadow-1);
+  border:1px solid var(--hairline);
+  border-top:4px solid var(--indigo);
+}
+.dash-card.teal{border-top-color:var(--teal);}
+.dash-card.orange{border-top-color:var(--orange);}
+.dash-card .label{font-size:.82rem; color:var(--ink-soft); margin-bottom:6px;}
+.dash-card .num{
+  font-family:var(--serif); font-weight:900;
+  font-size:clamp(1.8rem,4vw,2.4rem);
+  color:var(--indigo-deep); line-height:1;
+}
+.dash-card .num small{font-size:1rem; font-weight:700; margin-left:2px; color:var(--ink-soft);}
+.dash-card.teal .num{color:var(--teal);}
+.dash-card.orange .num{color:var(--orange);}
+.dash-empty{
+  background:var(--surface); border:1px dashed var(--hairline);
+  border-radius:var(--radius-l); padding:26px 20px; text-align:center; color:var(--ink-soft);
+}
+
+/* =========================
+   MY SCORES
+========================= */
+.score-row{
+  display:flex; align-items:center; gap:14px; padding:10px 0;
+  border-bottom:1px solid var(--hairline);
+}
+.score-row:last-child{border-bottom:none;}
+.score-row .sname{width:56px; font-weight:700; flex-shrink:0;}
+.score-row .sgrade{width:52px; flex-shrink:0; font-weight:700; color:var(--indigo);}
+.score-bar-track{
+  flex:1; height:10px; background:var(--gray-tint); border-radius:99px; overflow:hidden;
+}
+.score-bar-fill{height:100%; background:linear-gradient(90deg,var(--indigo-soft),var(--teal)); border-radius:99px;}
+.score-row .spt{width:78px; text-align:right; color:var(--ink-soft); font-size:.86rem; flex-shrink:0;}
+
+/* =========================
+   SIMULATION CARDS
+========================= */
+.sim-grid{
+  display:grid; grid-template-columns:1fr; gap:16px;
+}
+@media (min-width:720px){
+  .sim-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media (min-width:1100px){
+  .sim-grid{grid-template-columns:repeat(3,1fr);}
+}
+.sim-card{
+  background:var(--surface); border-radius:var(--radius-l); border:1px solid var(--hairline);
+  box-shadow:var(--shadow-1); padding:18px; display:flex; flex-direction:column; gap:12px;
+}
+.sim-card .sim-head{display:flex; justify-content:space-between; align-items:baseline;}
+.sim-card .sim-head h4{margin:0; font-family:var(--serif); font-size:1.08rem; color:var(--indigo-deep);}
+.sim-arrow{
+  display:flex; align-items:center; gap:8px; font-weight:700; font-size:1.05rem;
+}
+.grade-pill{
+  display:inline-block; padding:3px 10px; border-radius:999px; background:var(--indigo-tint); color:var(--indigo);
+  font-size:.92rem;
+}
+.grade-pill.up{background:var(--teal-tint); color:var(--teal);}
+.sim-metric-table{width:100%; border-collapse:collapse; font-size:.9rem;}
+.sim-metric-table td{padding:5px 4px; border-bottom:1px solid var(--hairline);}
+.sim-metric-table tr:last-child td{border-bottom:none;}
+.sim-metric-table td.mlabel{color:var(--ink-soft); width:34%;}
+.sim-metric-table td.mval{text-align:center; font-weight:700;}
+.sim-metric-table td.mnew{text-align:right; font-weight:900; color:var(--teal);}
+.big-plus{
+  font-family:var(--serif); font-weight:900; font-size:1.6rem; color:var(--teal);
+}
+.sim-maxed{
+  color:var(--ink-soft); font-size:.9rem; background:var(--gray-tint); border-radius:var(--radius-m); padding:14px; text-align:center;
+}
+.sim-newlist{
+  border-top:1px dashed var(--hairline); padding-top:10px; margin-top:2px;
+}
+.sim-newlist summary{cursor:pointer; font-weight:700; color:var(--indigo); font-size:.9rem;}
+.sim-newlist ul{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:6px;}
+.sim-newlist li{
+  font-size:.86rem; background:var(--teal-tint); border-radius:var(--radius-s); padding:8px 10px; color:#0A6B60;
+}
+.sim-newlist li b{color:var(--indigo-deep);}
+.simulate-btn{
+  align-self:flex-start; background:var(--indigo-tint); color:var(--indigo);
+  border:none; border-radius:999px; padding:8px 16px; font-weight:700; font-size:.85rem; cursor:pointer;
+}
+.simulate-btn:hover{background:var(--indigo); color:#fff;}
+
+/* ranking */
+.rank-list{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;}
+.rank-item{
+  display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--hairline);
+  border-radius:var(--radius-m); padding:12px 16px;
+}
+.rank-num{
+  font-family:var(--serif); font-weight:900; font-size:1.2rem; color:var(--indigo-soft); width:26px; flex-shrink:0;
+}
+.rank-name{font-weight:700; flex:1;}
+.rank-count{font-weight:900; color:var(--teal); font-family:var(--serif); font-size:1.05rem;}
+.rank-maxed{color:var(--ink-soft); font-size:.84rem;}
+.rank-note{
+  margin-top:14px; font-size:.86rem; color:var(--ink-soft); background:var(--indigo-tint);
+  border-radius:var(--radius-m); padding:12px 14px;
+}
+
+/* =========================
+   EXPLORE (voyage)
+========================= */
+.tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+.tab-btn{
+  border:1px solid var(--hairline); background:#fff; border-radius:999px; padding:8px 16px;
+  font-size:.86rem; font-weight:700; color:var(--ink-soft); cursor:pointer;
+}
+.tab-btn.active{background:var(--indigo); border-color:var(--indigo); color:#fff;}
+
+.status-columns{display:grid; grid-template-columns:1fr; gap:18px;}
+@media (min-width:860px){.status-columns{grid-template-columns:repeat(3,1fr);}}
+.status-col{background:var(--surface); border-radius:var(--radius-l); border:1px solid var(--hairline); padding:16px; box-shadow:var(--shadow-1);}
+.status-col h4{
+  margin:0 0 10px; font-family:var(--serif); font-size:1rem; display:flex; align-items:center; gap:8px;
+}
+.status-dot{width:10px; height:10px; border-radius:50%; display:inline-block;}
+.status-col.reached h4 .status-dot{background:var(--teal);}
+.status-col.near h4 .status-dot{background:var(--orange);}
+.status-col.gap h4 .status-dot{background:var(--gray-gap);}
+.status-col .count{font-weight:900; color:var(--ink-soft); font-size:.86rem; margin-left:auto;}
+.mini-list{list-style:none; margin:0; padding:0; max-height:340px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;}
+.mini-list li{
+  border:1px solid var(--hairline); border-radius:var(--radius-s); padding:8px 10px; font-size:.85rem;
+}
+.mini-list li .mn{font-weight:700; display:block;}
+.mini-list li .md{color:var(--ink-soft);}
+.empty-note{color:var(--ink-soft); font-size:.85rem;}
+
+/* =========================
+   SCHOOL LIST / FILTER
+========================= */
+.filter-bar{
+  display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;
+  background:var(--surface); border:1px solid var(--hairline); border-radius:var(--radius-m); padding:14px;
+}
+.filter-bar input[type=text]{
+  flex:1; min-width:180px; border:1px solid var(--hairline); border-radius:var(--radius-s);
+  padding:9px 12px; font-size:.9rem; font-family:inherit;
+}
+.filter-bar select{
+  border:1px solid var(--hairline); border-radius:var(--radius-s); padding:9px 10px; font-size:.86rem;
+  background:#fff; font-family:inherit; color:var(--ink);
+}
+.result-count{font-size:.85rem; color:var(--ink-soft); margin-bottom:12px;}
+
+.school-grid{display:grid; grid-template-columns:1fr; gap:14px;}
+@media (min-width:720px){.school-grid{grid-template-columns:repeat(2,1fr);}}
+@media (min-width:1100px){.school-grid{grid-template-columns:repeat(3,1fr);}}
+
+.school-card{
+  background:var(--surface); border:1px solid var(--hairline); border-radius:var(--radius-l);
+  padding:16px; box-shadow:var(--shadow-1); display:flex; flex-direction:column; gap:10px;
+}
+.school-card .cat-tag{
+  align-self:flex-start; font-size:.72rem; font-weight:700; color:var(--indigo-soft);
+  background:var(--indigo-tint); padding:3px 9px; border-radius:999px;
+}
+.school-card h5{margin:0; font-family:var(--serif); font-size:1.05rem; color:var(--indigo-deep);}
+.school-card .dept{color:var(--ink-soft); font-size:.9rem; margin-top:-6px;}
+.badge{
+  align-self:flex-start; font-size:.8rem; font-weight:700; padding:4px 11px; border-radius:999px;
+}
+.badge.reached{background:var(--teal-tint); color:var(--teal);}
+.badge.near{background:var(--orange-tint); color:var(--orange);}
+.badge.partial{background:var(--orange-tint); color:#96540E;}
+.badge.gap{background:var(--gray-tint); color:var(--gray-gap);}
+.badge.nodata{background:var(--gray-tint); color:var(--ink-soft);}
+.badge.special{background:var(--redsoft-tint); color:var(--redsoft);}
+.badge.genderBlocked{background:var(--redsoft-tint); color:var(--redsoft);}
+
+.metric-line{display:flex; justify-content:space-between; font-size:.87rem; padding:3px 0;}
+.metric-line .mname{color:var(--ink-soft);}
+.metric-line .mstat{font-weight:700;}
+.metric-line .mstat.ok{color:var(--teal);}
+.metric-line .mstat.gapv{color:var(--redsoft);}
+
+.gapbar{height:8px; background:var(--gray-tint); border-radius:99px; position:relative; overflow:hidden; margin:2px 0 6px;}
+.gapbar-fill{height:100%; border-radius:99px; background:var(--indigo-soft);}
+.gapbar-fill.ok{background:var(--teal);}
+
+.nodata-text{font-size:.85rem; color:var(--ink-soft); background:var(--gray-tint); border-radius:var(--radius-s); padding:8px 10px;}
+.special-text{font-size:.85rem; color:var(--redsoft); background:var(--redsoft-tint); border-radius:var(--radius-s); padding:8px 10px;}
+.na-text{font-size:.8rem; color:var(--ink-soft); font-style:normal; border-top:1px dashed var(--hairline); padding-top:8px;}
+
+/* =========================
+   TEACHER NOTE / FOOTER
+========================= */
+.note-card{
+  background:var(--indigo-tint); border-radius:var(--radius-l); padding:22px 24px; border:1px solid #D6DAF3;
+}
+.note-card h3{margin:0 0 12px; font-family:var(--serif); color:var(--indigo-deep);}
+.note-card ul{margin:0; padding-left:20px; color:var(--ink-soft); font-size:.92rem;}
+.note-card ul li{margin-bottom:8px;}
+
+footer{
+  background:var(--indigo-deep); color:#C9CFEF; padding:34px 0 44px; margin-top:20px;
+}
+footer h3{color:#fff; font-family:var(--serif); font-size:1.1rem; margin:0 0 12px;}
+footer ul{margin:0 0 18px; padding-left:20px; font-size:.86rem;}
+footer ul li{margin-bottom:6px;}
+footer .fine{font-size:.78rem; color:#8B92C0;}
+
+.disclaimer-box{
+  background:#fff; border-left:4px solid var(--orange); border-radius:var(--radius-m);
+  padding:14px 16px; font-size:.87rem; color:var(--ink-soft); margin-bottom:20px;
+}
+.disclaimer-box b{color:var(--ink);}
+
+.mini-warning{
+  margin-top:12px; font-size:.8rem; color:#8A5316; background:var(--orange-tint);
+  border-radius:var(--radius-s); padding:8px 10px;
+}
+.mini-warning:empty{display:none; padding:0; margin:0;}
+
+/* grade ladder (visualizes which grade-family a subject is currently at; not a ranking) */
+.grade-ladder{
+  display:flex; flex-wrap:wrap; align-items:center; gap:1px 3px;
+  font-size:.66rem; color:var(--ink-soft); margin-bottom:10px;
+}
+.ladder-step{padding:2px 5px; border-radius:5px;}
+.ladder-step.current{background:var(--indigo); color:#fff; font-weight:700;}
+.ladder-arrow{opacity:.4; font-size:.6rem;}
+
+/* stats panel */
+.stats-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+@media (min-width:640px){.stats-grid{grid-template-columns:repeat(5,1fr);}}
+.stats-item{
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+  background:var(--paper); border-radius:var(--radius-m); padding:12px 8px;
+}
+.stats-label{font-size:.78rem; color:var(--ink-soft);}
+.stats-num{font-family:var(--serif); font-weight:900; font-size:1.35rem; color:var(--indigo-deep); line-height:1;}
+.stats-unit{font-size:.72rem; color:var(--ink-soft);}
+.stats-total{margin-top:12px; text-align:center; color:var(--ink-soft); font-size:.88rem; font-weight:700;}
+
+/* simulation category breakdown */
+.sim-breakdown{
+  border-top:1px dashed var(--hairline); padding-top:10px; margin-top:2px;
+  display:flex; flex-direction:column; gap:4px;
+}
+.sim-breakdown-row{display:flex; justify-content:space-between; font-size:.83rem; color:var(--ink-soft);}
+.sim-breakdown-row b{color:var(--indigo-deep); font-weight:700;}
+
+/* ranking detail card */
+.rank-item-detail{flex-direction:column; align-items:stretch; gap:8px;}
+.rank-top{display:flex; align-items:center; gap:10px;}
+.rank-top .rank-name{flex:1;}
+.rank-mid{display:flex; flex-wrap:wrap; gap:10px 16px; font-size:.86rem; color:var(--ink-soft);}
+.rank-mid .rank-count{font-weight:900; color:var(--teal); font-family:var(--serif); font-size:1rem;}
+.rank-breakdown{font-size:.8rem; color:var(--ink-soft); background:var(--gray-tint); border-radius:var(--radius-s); padding:6px 10px;}
+
+/* highlight card */
+.highlight-card{
+  background:linear-gradient(155deg,var(--indigo-deep),var(--indigo-soft));
+  color:#fff; border-radius:var(--radius-l); padding:20px 22px; margin-bottom:16px;
+  box-shadow:var(--shadow-2);
+}
+.highlight-card.highlight-empty{background:var(--gray-tint); color:var(--ink-soft); text-align:center; padding:22px;}
+.highlight-kicker{font-size:.82rem; color:#C9CFEF; margin-bottom:8px; font-weight:700;}
+.highlight-main{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-family:var(--serif); font-size:1.15rem; font-weight:900; margin-bottom:10px;}
+.highlight-label{font-size:.78rem; font-weight:500; color:#C9CFEF; font-family:var(--sans);}
+.highlight-main .grade-pill{background:rgba(255,255,255,.16); color:#fff;}
+.highlight-main .grade-pill.up{background:#9FE8DC; color:#0A4A44;}
+.highlight-metrics{display:flex; flex-wrap:wrap; gap:14px; font-size:.92rem; font-weight:700; margin-bottom:10px;}
+.highlight-note{font-size:.8rem; color:#D6DAF3;}
+
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="hero-kicker">高雄區・免試入學・落點自我檢測</p>
+    <h1>116學年度<br>高雄區免試入學<br>落點預測</h1>
+    <p class="sub">輸入五科積點等第，看看目前成績與115年歷史錄取門檻的差距。</p>
+    <p class="tag">再進步一級，會多哪些選擇？</p>
+    <div class="writing-note">
+      ※ 116學年度寫作測驗目前尚未列入積點採計，因此本系統暫不納入計算。系統僅計算國文、數學、英語、社會、自然五科。
+    </div>
+    <div class="writing-note" id="versionBadge" style="margin-top:10px;"></div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <div class="disclaimer-box">
+      <b>提醒：</b>本系統以115年歷史最低錄取資料作為參考，並非116學年度正式錄取預測。實際錄取結果仍會受到當年度招生名額、志願序、超額比序及考生整體成績分布影響。
+    </div>
+
+    <!-- STEP 1+2+3: INPUT + DASHBOARD -->
+    <section class="section" id="inputSection">
+      <div class="top-grid">
+        <div class="panel" id="subjectPanel">
+          <h3>我的資料</h3>
+          <p class="hint">請先選擇性別，再點選每一科目前的等第。系統會即時計算總積點、總積分與可參考校系，不需要另外送出。</p>
+
+          <fieldset class="gender-selector" id="genderSelector">
+            <legend>性別</legend>
+            <label class="gender-option" data-gender="male">
+              <input type="radio" name="gender" value="male" id="genderMale">
+              <span class="gender-dot" aria-hidden="true"></span>
+              <span class="gender-label-text">男生</span>
+            </label>
+            <label class="gender-option" data-gender="female">
+              <input type="radio" name="gender" value="female" id="genderFemale">
+              <span class="gender-dot" aria-hidden="true"></span>
+              <span class="gender-label-text">女生</span>
+            </label>
+          </fieldset>
+          <p class="gender-help">部分校系（例如市立高雄女中）有性別限定資格，需先選擇性別才能正確判斷。</p>
+          <div id="genderReminder"></div>
+
+          <div class="rule-card">
+            <h4>高雄區免試入學比序規則</h4>
+            <ol>
+              <li><span class="rule-key">① 會考總積分</span></li>
+              <li><span class="rule-key">② 會考標示總積點</span><div class="rule-sub">只有總積分同分時，才會比較總積點</div></li>
+              <li><span class="rule-key">③ 單科積分</span><div class="rule-sub">國文→數學→英語→社會→自然</div></li>
+              <li><span class="rule-key">④ 單科標示</span><div class="rule-sub">國文→數學→英語→社會→自然</div></li>
+              <li><span class="rule-key">⑤ 寫作級分</span></li>
+            </ol>
+            <div><b>總積分優先；總積分同分時才比較總積點。</b>總積分較高者，不會因為總積點較低而被排除。</div>
+          </div>
+
+          <h3 style="font-size:1.05rem;">我的五科成績</h3>
+          <div id="subjectCards"></div>
+          <div class="panel-actions">
+            <button class="btn btn-ghost" id="btnReenter">重新輸入成績</button>
+            <button class="btn btn-danger" id="btnClear">清除我的資料</button>
+          </div>
+          <div id="completionBox"></div>
+          <div id="fiveAExplain"></div>
+        </div>
+
+        <div>
+          <div class="panel" style="margin-bottom:16px;">
+            <h3>我的升學儀表板</h3>
+            <p class="hint" style="margin-bottom:14px;">依115年歷史門檻資料換算的即時結果。</p>
+            <div id="dashboard"></div>
+            <div class="mini-warning">⚠️ 這裡顯示的是115年歷史資料，不是116年錄取結果。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY SCORES DETAIL -->
+    <section class="section" id="myScoresSection">
+      <div class="section-head">
+        <h2>我的五科成績分析</h2>
+        <p>只分析你自己的成績與115年歷史門檻，不會與其他學生比較。</p>
+      </div>
+      <div class="panel" id="myScoresPanel"></div>
+    </section>
+
+    <!-- UPGRADE SIMULATION -->
+    <section class="section" id="simSection">
+      <div class="section-head">
+        <h2>如果我再進步一級？</h2>
+        <p>試著看看，如果某一科再提升一個等第，你的選擇範圍會如何改變。你的每一分、每一點，都可能增加選擇。</p>
+      </div>
+      <div id="simContainer"></div>
+    </section>
+
+    <!-- RANKING -->
+    <section class="section" id="rankSection">
+      <div class="section-head">
+        <h2>哪一科提升一級，可能增加最多選擇？</h2>
+        <p>依115年歷史門檻資料模擬，提升該科一級後，新增的可參考校系數量。這是策略分析，不是對你能力的評價。</p>
+      </div>
+      <div id="rankHighlight"></div>
+      <div class="panel">
+        <ol class="rank-list" id="rankList" style="list-style:none;"></ol>
+        <div class="rank-note">若希望增加可參考校系範圍，可參考上方模擬結果的排序；但這僅反映115年歷史資料，不代表正式升學策略建議。</div>
+      </div>
+    </section>
+
+    <!-- EXPLORE -->
+    <section class="section" id="exploreSection">
+      <div class="section-head">
+        <h2>我的志願探索</h2>
+        <p>依目前成績與115年歷史門檻，將校系分成三類。可切換學校類型查看。</p>
+      </div>
+      <div class="tabs" id="exploreTabs"></div>
+      <div class="mini-warning" id="exploreFiveYearNotice" style="margin-bottom:14px;"></div>
+      <div class="status-columns" id="exploreColumns"></div>
+    </section>
+
+    <!-- FULL SCHOOL LIST -->
+    <section class="section" id="listSection">
+      <div class="section-head">
+        <h2>115年最低錄取門檻完整資料</h2>
+        <p>可搜尋、篩選、排序，資料涵蓋公立高中、公立高職、私立高中職、進修部與五專。</p>
+      </div>
+      <div class="panel" id="dataStatsPanel" style="margin-bottom:16px;">
+        <h3 style="font-size:1.02rem;">本系統目前分析</h3>
+        <div id="dataStats"></div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="搜尋學校或科組，例如：高雄、鳳山、高工、資訊、商業、普通科">
+        <select id="filterCategory"></select>
+        <select id="filterStatus">
+          <option value="all">門檻狀態：全部</option>
+          <option value="reached">已達115年參考門檻</option>
+          <option value="near">接近門檻</option>
+          <option value="not_reached">尚未達到門檻</option>
+        </select>
+        <select id="sortSelect">
+          <option value="closest">最接近我的成績</option>
+          <option value="easiest">最容易達標</option>
+          <option value="scoreDesc">最低錄取門檻由高到低</option>
+          <option value="name">學校名稱</option>
+        </select>
+      </div>
+      <div class="result-count" id="resultCount"></div>
+      <div class="school-grid" id="schoolGrid"></div>
+    </section>
+
+    <!-- TEACHER NOTE -->
+    <section class="section" id="teacherSection">
+      <div class="note-card">
+        <h3>老師提醒</h3>
+        <ul>
+          <li>落點預測不是志願選填的答案，而是幫助你了解目前成績位置的工具。</li>
+          <li>真正選填志願時，仍應綜合考量自己的興趣、學校特色、科別內容、交通距離及當年度招生名額。</li>
+          <li>115年最低錄取分數是歷史資料，不代表116學年度一定會以相同分數錄取。</li>
+          <li>高雄區免試入學實際錄取還涉及比序及招生名額；如果總積分相同，不能只靠本系統的最低錄取門檻判斷實際錄取結果。本系統未模擬完整超額比序程序。</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <h3>資料來源與使用說明</h3>
+    <ul>
+      <li>本系統使用115年高雄區高中職最低錄取分數參考資料作為歷史門檻參考。</li>
+      <li>116學年度實際招生名額、錄取標準及超額比序結果，應以主管機關正式公告為準。</li>
+      <li>本系統僅供學生進行升學方向與成績提升模擬，不代表實際錄取結果。</li>
+      <li>116學年度寫作測驗目前尚未列入本系統積點計算。</li>
+      <li>五專資料包含「優先免試積分」與「聯合免試總積分／總積點」，三者計算基礎不同，系統不會混合計算；「優先免試積分」不適用本系統的高中職五科門檻演算法，僅供參考，請以原始招生資訊為準。</li>
+      <li>部分欄位標示「無人選填」「-」「無開放」，代表無有效最低錄取門檻資料，已排除在門檻比對之外；標示為特殊格式者（如「18--10」）保留原始資料，未自行猜測其意義。</li>
+    </ul>
+    <p class="fine">本系統不會自動將你的成績上傳或同步至任何伺服器；五科等第僅儲存在你目前使用的瀏覽器（localStorage）。</p>
+  </div>
+</footer>
+
+<script>
+/* =========================
+   DATA / SYSTEM VERSION
+   第二版新增：所有「資料是哪一年」「系統改到第幾版」的文字，
+   都從這兩個常數輸出，未來換成116年正式資料時，只需要改這裡。
+========================= */
+const DATA_YEAR = 115;
+const SYSTEM_VERSION = "3.0";
+
+/* =========================
+   SCHOOL DATA (raw, transcribed as-is from Kaohsiung_HighSchool_Scores_2026.xlsx)
+   Format for high-school-style sheets: [school, dept, rawScore, rawPoints]
+   Format for five-year junior college sheet: [school, dept, rawPriorityScore, rawJointScore, rawJointPoints]
+========================= */
+const rawPublicHighSchool = [
+["市立高雄中學","普通科",30,29],
+["市立高雄女中","普通科",28,30],
+["國立高師大附中","普通科",28,30],
+["國立鳳山高中","普通科",28,26],
+["國立中山大學附中","普通科",24,23],
+["市立新莊高中","普通科",26,23],
+["國立鳳新高中","普通科",26,22],
+["市立瑞祥高中","普通科",24,21],
+["市立新興高中","普通科",24,21],
+["市立中正高中","普通科",22,21],
+["市立三民高中","普通科",22,18],
+["市立前鎮高中","普通科",22,16],
+["市立福誠高中","普通科",20,18],
+["市立文山高中","普通科",20,16],
+["市立中山高中","普通科",20,16],
+["市立左營高中","普通科",20,14],
+["市立小港高中","普通科",20,11],
+["國立岡山高中","普通科",18,11],
+["市立鼓山高中","普通科",18,10],
+["市立楠梓高中","普通科",16,9],
+["市立仁武高中","普通科",16,8]
+];
+
+const rawPublicVocational = [
+["市立高雄高工","電機科",22,20],
+["市立高雄高工","資訊科",20,18],
+["市立高雄高工","電子科",22,17],
+["市立高雄高工","建築科",20,14],
+["市立高雄高工","電腦機械製圖科",20,13],
+["市立高雄高工","化工科",20,18],
+["市立高雄高工","機械科",20,14],
+["市立高雄高工","電機空調科",20,15],
+["市立高雄高工","汽車科",20,12],
+["市立高雄高工","圖文傳播科",20,12],
+["市立高雄高商","廣告設計科",20,12],
+["市立高雄高商","國際貿易科",18,13],
+["市立高雄高商","會計事務科",18,10],
+["市立高雄高商","資料處理科",18,11],
+["市立高雄高商","商業經營科",20,11],
+["國立鳳山商工","觀光事業科",16,10],
+["國立鳳山商工","室內空間設計科",18,9],
+["國立鳳山商工","國際貿易科","無人選填","-"],
+["國立鳳山商工","資料處理科",20,12],
+["國立鳳山商工","家具設計科",16,9],
+["國立鳳山商工","商業經營科",14,7],
+["國立鳳山商工","電腦機械製圖科",12,6],
+["國立鳳山商工","機械科",16,8],
+["市立三民家商","觀光事業科",20,11],
+["市立三民家商","餐飲管理科",20,12],
+["市立三民家商","幼兒保育科",18,13],
+["市立三民家商","室內設計科",20,11],
+["市立三民家商","資料處理科",20,14],
+["市立三民家商","國際貿易科",20,11],
+["市立三民家商","美容科",20,10],
+["市立三民家商","服裝科",20,12],
+["市立中正高工","電機科",20,19],
+["市立中正高工","電子科",20,12],
+["市立中正高工","機械科",20,10],
+["市立中正高工","資訊科",18,12],
+["市立中正高工","金屬工藝科",14,7],
+["市立中正高工","冷凍空調科",18,10],
+["市立中正高工","汽車科",16,8],
+["市立中正高工","電腦機械製圖科",18,9],
+["市立中正高工","化工科",14,7],
+["市立中正高工","建築科",14,8],
+["市立海青工商","廣告設計科",18,11],
+["市立海青工商","美工科",18,11],
+["市立海青工商","資料處理科",18,10],
+["市立海青工商","會計",14,7],
+["市立海青工商","室內空間設計",18,9],
+["市立海青工商","土木",16,8],
+["市立海青工商","建築科",16,8],
+["市立海青工商","資訊科",16,10]
+];
+
+const rawEveningDivision = [
+["市立中正高工進修部","金屬工藝科",14,7],
+["市立高雄高工進修部","資訊科",14,7],
+["市立鳳山商工進修部","資料處理科",10,5]
+];
+
+const rawPrivateSchool = [
+["私立復華高中","普通科",22,20],
+["私立正義高中","普通科",20,15],
+["私立立志高中","普通科",20,14],
+["私立立志高中","電機與電子群(資訊)",18,9],
+["私立立志高中","餐飲管理科",14,7],
+["私立立志高中","汽車科",14,7],
+["私立立志高中","電競經營科",12,6],
+["私立中華藝校","舞蹈科",22,16],
+["私立中華藝校","時尚工藝科",18,9],
+["私立中華藝校","影劇科",14,7],
+["樹德家商","應用英語科",20,13],
+["樹德家商","表演藝術科",18,10],
+["樹德家商","商業經營科",14,7],
+["樹德家商","觀光事業科",12,6],
+["樹德家商","美容科",12,6],
+["樹德家商","商業經營科","無人選填","-"],
+["私立大榮高中","飛機修護科",18,11],
+["私立三信家商","（資料組別）","18--10","9--5"],
+["私立中山工商","汽車科",14,7],
+["私立天主教道明中學","普通科",12,6],
+["私立明誠高中","普通科","無人選填","-"]
+];
+
+const rawFiveYearJuniorCollege = [
+["國立高雄餐旅大學","餐飲廚藝科(五專菁英班)","無開放",24,10],
+["國立高雄科技大學","模具工程科",76.1,20,13],
+["國立高雄科技大學","航海科",75.6,"無人選填","-"],
+["國立高雄科技大學","輪機工程科",74,"無人選填","-"],
+["國立高雄科技大學","漁業科技與管理科",73.4,"無人選填","-"],
+["文藻外語大學","法國語文科",75.6,22,15],
+["文藻外語大學","英國語文科",76.1,16,8],
+["文藻外語大學","西班牙語文科",76.6,"無人選填","-"],
+["文藻外語大學","德國語文科",75.4,"無人選填","-"],
+["文藻外語大學","日本語文科",77.1,"無人選填","-"],
+["台南護理專科學校","護理科",77.6,"無人選填","-"],
+["台南護理專科學校","化妝品應用科",76.1,"無人選填","-"],
+["台南護理專科學校","老人服務事業科",74.6,"無人選填","-"],
+["樹人醫護管理專科學校","職能治療科",75.1,20,10],
+["樹人醫護管理專科學校","醫學影像暨放射技術科",62,16,8],
+["樹人醫護管理專科學校","物理治療科",73.6,"無人選填","-"],
+["樹人醫護管理專科學校","牙體技術科",64.75,"無人選填","-"],
+["樹人醫護管理專科學校","美容保健科",65,"無人選填","-"],
+["樹人醫護管理專科學校","幼兒保育科",64.25,"無人選填","-"],
+["樹人醫護管理專科學校","視光學科",56.5,"無人選填","-"],
+["樹人醫護管理專科學校","資訊管理科",53.75,"無人選填","-"],
+["樹人醫護管理專科學校","護理科",35.1,"無人選填","-"],
+["樹人醫護管理專科學校","口腔衛生學科",26,"無人選填","-"],
+["正修科技大學","電機工程科",64.7,20,12],
+["正修科技大學","土木工程科",55,20,10],
+["正修科技大學","機械工程科",67.95,"無人選填","-"],
+["育英醫護管理專科學校","老人服務事業管理科",62,16,8],
+["育英醫護管理專科學校","護理科",61.4,"無人選填","-"],
+["育英醫護管理專科學校","化妝品應用與管理科",30.25,"無人選填","-"],
+["中華醫事科技大學","護理科",74.3,"無人選填","-"],
+["中華醫事科技大學","寵物照護與美容科",64.25,"無人選填","-"],
+["中華醫事科技大學","生醫及美容保健科",62,"無人選填","-"],
+["中華醫事科技大學","醫務暨健康事業管理科",62,"無人選填","-"],
+["中華醫事科技大學","幼兒保育科",61.25,"無人選填","-"],
+["嘉南藥理大學","藥粧生技產業科",74.1,"無人選填","-"],
+["嘉南藥理大學","食藥產業暨檢測科技科",73.8,"無人選填","-"],
+["美和科技大學","護理科",55.6,"無人選填","-"],
+["美和科技大學","食品營養科",47.25,"無人選填","-"],
+["美和科技大學","美容科寵物美容設計組",47.25,"無人選填","-"],
+["南臺科技大學","資訊工程科",16,"無人選填","-"]
+];
+
+/* Markers found in the source Excel that mean "no valid threshold data" */
+const NO_DATA_MARKERS = ["無人選填","-","無開放"];
+
+/* =========================
+   GENDER ELIGIBILITY (data layer)
+   Only schools that are actually single-gender-admission are listed here.
+   Everything else defaults to "all" — see genderRestriction ?? "all" below,
+   so existing data never breaks if a school isn't listed.
+========================= */
+const GENDER_RESTRICTIONS = {
+  "市立高雄女中": "female"
+};
+function getGenderRestriction(school){
+  return GENDER_RESTRICTIONS[school] ?? "all";
+}
+/* school here is a school ENTRY object (must carry .genderRestriction), not a bare name string. */
+function isGenderEligible(school, genderValue){
+  const restriction = school.genderRestriction ?? "all";
+  if (restriction === "female") return genderValue === "female";
+  if (restriction === "male") return genderValue === "male";
+  return true;
+}
+
+function classifyPair(rawScore, rawPoints){
+  if (typeof rawScore === "string" && NO_DATA_MARKERS.includes(rawScore.trim())){
+    return {status:"no_data", rawScore, rawPoints};
+  }
+  if (typeof rawScore === "string" && rawScore.indexOf("--") !== -1){
+    return {status:"special", rawScore, rawPoints};
+  }
+  if (typeof rawScore === "number" && typeof rawPoints === "number"){
+    return {status:"valid", score:rawScore, points:rawPoints};
+  }
+  // Safety fallback: never invent a number, always flag as no_data with raw values preserved.
+  return {status:"no_data", rawScore, rawPoints};
+}
+
+function classifySingle(rawValue){
+  if (typeof rawValue === "number") return {status:"valid", value:rawValue};
+  if (typeof rawValue === "string" && NO_DATA_MARKERS.includes(rawValue.trim())) return {status:"no_data", rawValue};
+  return {status:"special", rawValue};
+}
+
+function buildHighSchoolLike(rawList, category, categoryLabel){
+  return rawList.map(([school, dept, rawScore, rawPoints]) => {
+    const pair = classifyPair(rawScore, rawPoints);
+    return {
+      id: category + "|" + school + "|" + dept,
+      category, categoryLabel, school, dept,
+      status: pair.status,
+      score: pair.score, points: pair.points,
+      rawScore: pair.rawScore, rawPoints: pair.rawPoints,
+      genderRestriction: getGenderRestriction(school)
+    };
+  });
+}
+
+function buildFiveYear(rawList){
+  return rawList.map(([school, dept, rawPriority, rawJointScore, rawJointPoints]) => {
+    const priority = classifySingle(rawPriority);
+    const joint = classifyPair(rawJointScore, rawJointPoints);
+    return {
+      id: "fiveYearJuniorCollege|" + school + "|" + dept,
+      category: "fiveYearJuniorCollege", categoryLabel: "五專",
+      school, dept,
+      priority, joint,
+      genderRestriction: getGenderRestriction(school)
+    };
+  });
+}
+
+const schoolData = {
+  publicHighSchool: buildHighSchoolLike(rawPublicHighSchool, "publicHighSchool", "公立高中"),
+  publicVocational: buildHighSchoolLike(rawPublicVocational, "publicVocational", "公立高職"),
+  eveningDivision: buildHighSchoolLike(rawEveningDivision, "eveningDivision", "進修部"),
+  privateSchool: buildHighSchoolLike(rawPrivateSchool, "privateSchool", "私立高中職"),
+  fiveYearJuniorCollege: buildFiveYear(rawFiveYearJuniorCollege)
+};
+
+const CATEGORY_LABELS = {
+  publicHighSchool: "公立高中",
+  publicVocational: "公立高職",
+  eveningDivision: "進修部",
+  privateSchool: "私立高中職",
+  fiveYearJuniorCollege: "五專"
+};
+const CATEGORY_ORDER = ["publicHighSchool","publicVocational","privateSchool","eveningDivision","fiveYearJuniorCollege"];
+
+/* Flat list combining all high-school-like categories (used for eligibility & counting) */
+function getComparableFlatList(){
+  const flat = [];
+  ["publicHighSchool","publicVocational","eveningDivision","privateSchool"].forEach(cat=>{
+    schoolData[cat].forEach(e=> flat.push(e));
+  });
+  // Five-year junior college: only the "聯合免試" (joint) figures are on the same 積分/積點 scale
+  // and therefore comparable to a student's five-subject totals. "優先免試" is a different scale
+  // and is never merged into this comparison (see spec section 17).
+  schoolData.fiveYearJuniorCollege.forEach(e=>{
+    flat.push({
+      id: e.id, category: e.category, categoryLabel: e.categoryLabel,
+      school: e.school, dept: e.dept,
+      status: e.joint.status, score: e.joint.score, points: e.joint.points,
+      rawScore: e.joint.rawScore, rawPoints: e.joint.rawPoints,
+      genderRestriction: e.genderRestriction,
+      isFiveYearJoint: true
+    });
+  });
+  return flat;
+}
+
+/* =========================
+   GRADE SYSTEM
+   Source: 高雄區高級中等學校免試入學-比序項目採計說明。
+   國中教育會考標示積點： A++=7, A+=6, A=5, B++=4, B+=3, B=2, C=1（上限35點，5科）
+   國中教育會考等級積分： 精熟(A++/A+/A)=6分, 基礎(B++/B+/B)=4分, 待加強(C)=2分（上限30分，5科）
+   若116學年度正式規則公布後有變動，僅需修改本區塊的 gradePoints / gradeScoreBySubjectGrade。
+========================= */
+const GRADE_ORDER = ["C","B","B+","B++","A","A+","A++"]; // low -> high
+
+const gradePoints = {
+  "A++": 7,
+  "A+": 6,
+  "A": 5,
+  "B++": 4,
+  "B+": 3,
+  "B": 2,
+  "C": 1
+};
+
+const gradeScoreBySubjectGrade = {
+  "A++": 6, "A+": 6, "A": 6,
+  "B++": 4, "B+": 4, "B": 4,
+  "C": 2
+};
+
+const SUBJECTS = [
+  {key:"chinese", label:"國文"},
+  {key:"math", label:"數學"},
+  {key:"english", label:"英語"},
+  {key:"social", label:"社會"},
+  {key:"science", label:"自然"}
+]; // Writing test is intentionally NOT included anywhere in this list or in any calculation below.
+
+const NEAR_SCORE_GAP = 1;
+const NEAR_POINT_GAP = 2;
+
+function gradeToPoint(grade){
+  return Object.prototype.hasOwnProperty.call(gradePoints, grade) ? gradePoints[grade] : null;
+}
+function gradeToSubjectScore(grade){
+  return Object.prototype.hasOwnProperty.call(gradeScoreBySubjectGrade, grade) ? gradeScoreBySubjectGrade[grade] : null;
+}
+function isSubjectsComplete(subjectsObj){
+  return SUBJECTS.every(s => subjectsObj[s.key] !== null && subjectsObj[s.key] !== undefined);
+}
+function calculateTotalPoints(subjectsObj){
+  if (!isSubjectsComplete(subjectsObj)) return null;
+  return SUBJECTS.reduce((sum, s) => sum + gradeToPoint(subjectsObj[s.key]), 0);
+}
+/* NOTE on calculateTotalScore:
+   Each subject's 積分 value is determined by that subject's OWN grade family (精熟/基礎/待加強),
+   not by the sum of points across subjects. So this function is computed from the subjects object
+   directly (not purely from a single aggregate totalPoints number) to stay faithful to the official
+   高雄區 conversion rule confirmed above. */
+function calculateTotalScore(subjectsObj){
+  if (!isSubjectsComplete(subjectsObj)) return null;
+  return SUBJECTS.reduce((sum, s) => sum + gradeToSubjectScore(subjectsObj[s.key]), 0);
+}
+
+/* =========================
+   STATE + LOCAL STORAGE
+========================= */
+const STORAGE_KEY = "kh116_subjects_v1";
+
+let subjects = { chinese:null, math:null, english:null, social:null, science:null };
+/* gender: "male" | "female" | null. Must NEVER default to a value — the student
+   must actively choose, per spec section 12 (no default gender). */
+let gender = null;
+
+function loadSubjects(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (!parsed) return;
+    // New format: { gender, subjects:{...} }. Fall back to the legacy flat
+    // format (subjects only, no gender key) so old saved data still loads.
+    const subjectsSource = (parsed.subjects && typeof parsed.subjects === "object") ? parsed.subjects : parsed;
+    SUBJECTS.forEach(s=>{
+      if (subjectsSource && typeof subjectsSource[s.key] === "string" && GRADE_ORDER.includes(subjectsSource[s.key])){
+        subjects[s.key] = subjectsSource[s.key];
+      }
+    });
+    if (parsed.gender === "male" || parsed.gender === "female"){
+      gender = parsed.gender;
+    }
+  }catch(e){ /* ignore corrupted storage */ }
+}
+function saveSubjects(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ gender, subjects }));
+  }catch(e){ /* storage may be unavailable; app still works in-memory */ }
+}
+function clearSubjects(){
+  subjects = { chinese:null, math:null, english:null, social:null, science:null };
+  gender = null;
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+
+/* =========================
+   SCORE CALCULATION / RESULT
+========================= */
+function getCurrentResult(){
+  return {
+    subjects: {...subjects},
+    complete: isSubjectsComplete(subjects),
+    totalPoints: calculateTotalPoints(subjects),
+    totalScore: calculateTotalScore(subjects)
+  };
+}
+
+/* =========================
+   SCHOOL MATCHING / ADMISSION POSITION COMPARISON
+
+ * 高雄區免試入學比序：
+ *
+ * 1. 總積分優先
+ * 2. 總積分相同才比較總積點
+ * 3. 總積分不同時，不得用總積點將前一層已勝出的學生否決
+ *
+ * 例如：
+ * 學生 30分25點
+ * 歷史資料 28分30點
+ *
+ * 因為 30 > 28，
+ * 學生已在總積分層級勝出。
+ *
+ * 不得因為 25 < 30 而判定未達標。
+ *
+ * (歷史資料只保留每校「總積分／總積點」兩個彙總數字，沒有逐科的積分／積點／
+ *  寫作資料，因此本系統只能依這兩層做「歷史參考位置」比對；單科與寫作僅列在
+ *  上方比序規則說明卡中，作為完整比序規則的後續層級，不在此處計算。)
+========================= */
+function compareAdmissionPosition(student, historical){
+  // student: {totalScore, totalPoint}
+  // historical: {score, points}  (a school's 115年 historical minimum admission position)
+  // returns: 1 = student優於historical, 0 = 相同, -1 = student劣於historical
+  if (student.totalScore !== historical.score){
+    return student.totalScore > historical.score ? 1 : -1;
+  }
+  if (student.totalPoint !== historical.points){
+    return student.totalPoint > historical.points ? 1 : -1;
+  }
+  return 0;
+}
+
+function getSchoolGap(entry, score, points, genderValue){
+  // entry must have numeric .score/.points (already filtered to status === 'valid')
+  if (!isGenderEligible(entry, genderValue)){
+    const restriction = entry.genderRestriction ?? "all";
+    const restrictionLabel = restriction === "female" ? "女生" : "男生";
+    return {
+      genderRestricted: true,
+      genderRestriction: restriction,
+      comparison: null,
+      filterStatus: "gender_blocked",
+      badgeClass: "genderBlocked",
+      badgeLabel: genderValue
+        ? `僅限${restrictionLabel}就讀，不開放你目前選擇的性別`
+        : `此校系限定${restrictionLabel}，請先選擇性別`
+    };
+  }
+
+  const comparison = compareAdmissionPosition(
+    { totalScore: score, totalPoint: points },
+    { score: entry.score, points: entry.points }
+  );
+  const scoreDiff = score - entry.score;   // >=0 表示總積分已勝出或同分
+  const pointDiff = points - entry.points; // >=0 表示總積點已勝出或同分
+  const sameScore = scoreDiff === 0;
+
+  // 「差距」只看真正決定勝負的那一層：總積分不同就只看總積分差距，
+  // 總積分相同才看總積點差距。不會出現「雙門檻」式的合併差距。
+  const compareLayer = sameScore ? "point" : "score";
+  const gapAmount = compareLayer === "score" ? Math.max(0, -scoreDiff) : Math.max(0, -pointDiff);
+
+  const base = comparison >= 0 ? "reached" : "not_reached";
+  const near = base !== "reached" &&
+    (compareLayer === "score" ? gapAmount <= NEAR_SCORE_GAP : gapAmount <= NEAR_POINT_GAP);
+  const filterStatus = base === "reached" ? "reached" : (near ? "near" : "not_reached");
+
+  let badgeLabel, badgeClass;
+  if (base === "reached"){ badgeLabel = "達到115年歷史參考位置"; badgeClass = "reached"; }
+  else if (near){ badgeLabel = "接近115年歷史參考位置"; badgeClass = "near"; }
+  else { badgeLabel = "尚未達到115年歷史參考位置"; badgeClass = "gap"; }
+
+  return {
+    genderRestricted: false,
+    comparison, scoreDiff, pointDiff, sameScore, compareLayer, gapAmount,
+    base, near, filterStatus, badgeLabel, badgeClass
+  };
+}
+
+function getEligibleSchools(score, points, genderValue){
+  if (score === null || points === null) return [];
+  const flat = getComparableFlatList();
+  return flat
+    .filter(e => e.status === "valid")
+    .filter(e => isGenderEligible(e, genderValue))
+    .map(e => ({ entry:e, gap: getSchoolGap(e, score, points, genderValue) }));
+}
+
+function getNearSchools(score, points, genderValue){
+  return getEligibleSchools(score, points, genderValue).filter(r => r.gap.filterStatus === "near");
+}
+
+/* =========================
+   SIMULATION
+========================= */
+function getNextGrade(grade){
+  const idx = GRADE_ORDER.indexOf(grade);
+  if (idx === -1 || idx === GRADE_ORDER.length - 1) return null;
+  return GRADE_ORDER[idx + 1];
+}
+
+function simulateSubjectUpgrade(subjectKey){
+  const currentGrade = subjects[subjectKey];
+  if (!currentGrade) return { subject: subjectKey, notEntered: true };
+  if (currentGrade === "A++") return { subject: subjectKey, cannotUpgrade: true, currentGrade };
+
+  const upgradedGrade = getNextGrade(currentGrade);
+  const originalSubjects = {...subjects};
+  const simulatedSubjects = {...subjects, [subjectKey]: upgradedGrade};
+
+  const currentPoints = calculateTotalPoints(originalSubjects);
+  const currentScore = calculateTotalScore(originalSubjects);
+  const simulatedPoints = calculateTotalPoints(simulatedSubjects);
+  const simulatedScore = calculateTotalScore(simulatedSubjects);
+
+  const currentEligible = getEligibleSchools(currentScore, currentPoints, gender).filter(r => r.gap.filterStatus === "reached");
+  const simulatedEligible = getEligibleSchools(simulatedScore, simulatedPoints, gender).filter(r => r.gap.filterStatus === "reached");
+  const newSchools = getNewSchools(currentEligible, simulatedEligible);
+
+  // Category breakdown of the newly-eligible schools. Built purely by counting
+  // `newSchools` by their real `category` field — never hard-coded.
+  const newSchoolsByCategory = {};
+  CATEGORY_ORDER.forEach(c => { newSchoolsByCategory[c] = 0; });
+  newSchools.forEach(r => {
+    if (Object.prototype.hasOwnProperty.call(newSchoolsByCategory, r.entry.category)){
+      newSchoolsByCategory[r.entry.category] += 1;
+    }
+  });
+
+  // Simulation never mutates the student's real saved data; `subjects` (module state) is untouched above.
+  return {
+    subject: subjectKey,
+    currentGrade, upgradedGrade,
+    currentPoints, simulatedPoints,
+    currentScore, simulatedScore,
+    deltaPoints: simulatedPoints - currentPoints,
+    deltaScore: simulatedScore - currentScore,
+    currentEligibleCount: currentEligible.length,
+    simulatedEligibleCount: simulatedEligible.length,
+    newSchoolCount: newSchools.length,
+    newSchools: newSchools.map(r => r.entry),
+    newSchoolsByCategory
+  };
+}
+
+/* Turns a newSchoolsByCategory object into a short human-readable string,
+   e.g. "公立高中 +1、五專 +2". Only non-zero categories are listed.
+   Used by both the ranking list and the highlight card. */
+function formatCategoryBreakdown(breakdown){
+  const parts = CATEGORY_ORDER
+    .filter(c => breakdown[c] > 0)
+    .map(c => `${CATEGORY_LABELS[c]}＋${breakdown[c]}`);
+  return parts.length ? parts.join('、') : '此次模擬暫無新增校系';
+}
+
+function getNewSchools(currentList, simulatedList){
+  const currentIds = new Set(currentList.map(r => r.entry.id));
+  return simulatedList.filter(r => !currentIds.has(r.entry.id));
+}
+
+function compareResults(simResult){
+  if (!simResult || simResult.cannotUpgrade || simResult.notEntered) return null;
+  return [
+    { label:"總積點", current: simResult.currentPoints, simulated: simResult.simulatedPoints },
+    { label:"總積分", current: simResult.currentScore, simulated: simResult.simulatedScore },
+    { label:"達標校系", current: simResult.currentEligibleCount, simulated: simResult.simulatedEligibleCount },
+    { label:"新增校系", current: "—", simulated: "+" + simResult.newSchoolCount }
+  ];
+}
+
+/* =========================
+   DATA STATISTICS (spec section 15 — all numbers computed from schoolData, never hard-coded)
+========================= */
+function getDataStats(){
+  const counts = {};
+  CATEGORY_ORDER.forEach(c => { counts[c] = schoolData[c].length; });
+  const total = CATEGORY_ORDER.reduce((sum,c) => sum + counts[c], 0);
+  return { counts, total };
+}
+
+function getUpgradeRanking(){
+  return SUBJECTS
+    .map(s => ({ ...s, result: simulateSubjectUpgrade(s.key) }))
+    .filter(r => r.result && !r.result.cannotUpgrade && !r.result.notEntered)
+    .sort((a,b) => b.result.newSchoolCount - a.result.newSchoolCount);
+}
+
+/* =========================
+   FILTER / SEARCH / SORT (full list section)
+========================= */
+function buildDisplayList(){
+  // Build a unified display list across all categories, each row carrying whatever
+  // comparison info is applicable to it (may be none, for 優先免試-only / no_data / special rows).
+  const result = getCurrentResult();
+  const rows = [];
+
+  ["publicHighSchool","publicVocational","privateSchool","eveningDivision"].forEach(cat=>{
+    schoolData[cat].forEach(e=>{
+      let gap = null;
+      if (e.status === "valid" && result.complete){
+        gap = getSchoolGap(e, result.totalScore, result.totalPoints, gender);
+      }
+      rows.push({ kind:"standard", entry:e, gap });
+    });
+  });
+
+  schoolData.fiveYearJuniorCollege.forEach(e=>{
+    let jointGap = null;
+    if (e.joint.status === "valid" && result.complete){
+      jointGap = getSchoolGap(
+        { school:e.school, score:e.joint.score, points:e.joint.points, genderRestriction:e.genderRestriction },
+        result.totalScore, result.totalPoints, gender
+      );
+    }
+    rows.push({ kind:"fiveYear", entry:e, gap: jointGap });
+  });
+
+  return rows;
+}
+
+function matchesSearch(row, keyword){
+  if (!keyword) return true;
+  const k = keyword.trim().toLowerCase();
+  if (!k) return true;
+  return row.entry.school.toLowerCase().includes(k) || row.entry.dept.toLowerCase().includes(k);
+}
+function matchesCategory(row, cat){
+  if (cat === "all") return true;
+  return row.entry.category === cat;
+}
+function matchesStatus(row, status){
+  if (status === "all") return true;
+  if (!row.gap) return false; // rows without comparable data only show under "全部"
+  return row.gap.filterStatus === status;
+}
+
+/* -------------------------------------------------------------------------
+   排序邏輯說明（第三版：改為依「比序位置」排序，不再使用雙門檻式合併差距）：
+
+   校系是否「已達標」一律以 gap.comparison >= 0（compareAdmissionPosition 的結果）
+   判斷，已達標者一律排最前面。尚未達標的校系，才需要排序「還差多少」：
+
+   ① 最接近我的成績 (closest)
+      想回答：「哪些校系的門檻，整體上跟我目前的成績最像？」
+      做法：先比總積分差距的絕對值 |scoreDiff|；相同時再比總積點差距的絕對值 |pointDiff|。
+
+   ② 最容易達標 (easiest)
+      想回答：「哪些尚未達標的校系，只要再進步一點點就能達標？」
+      做法：以「決定性那一層」的差距（gap.gapAmount，也就是還沒達標時真正卡住的
+      那一層差距）為第一排序依據，數值越小代表越接近達標；同樣大小時再用
+      |scoreDiff| 做 tie-break。這不再把總積分差距與總積點差距混在一起相加，
+      避免又重新產生「雙門檻」式的判斷方式。
+
+   性別不符（gender_blocked）的校系一律排到最後（併入 withoutGap），
+   因為它們不屬於這位學生目前可參考的比序結果。
+------------------------------------------------------------------------- */
+function sortRows(rows, mode){
+  const withGap = rows.filter(r => r.gap && !r.gap.genderRestricted);
+  const withoutGap = rows.filter(r => !r.gap || r.gap.genderRestricted);
+  let sorted;
+  if (mode === "closest"){
+    sorted = withGap.slice().sort((a,b)=>{
+      const reachedA = a.gap.comparison >= 0, reachedB = b.gap.comparison >= 0;
+      if (reachedA !== reachedB) return reachedA ? -1 : 1;
+      const sa = Math.abs(a.gap.scoreDiff), sb = Math.abs(b.gap.scoreDiff);
+      if (sa !== sb) return sa - sb;
+      return Math.abs(a.gap.pointDiff) - Math.abs(b.gap.pointDiff);
+    });
+  } else if (mode === "easiest"){
+    sorted = withGap.slice().sort((a,b)=>{
+      const reachedA = a.gap.comparison >= 0, reachedB = b.gap.comparison >= 0;
+      if (reachedA !== reachedB) return reachedA ? -1 : 1;
+      if (reachedA && reachedB) return 0;
+      if (a.gap.gapAmount !== b.gap.gapAmount) return a.gap.gapAmount - b.gap.gapAmount;
+      return Math.abs(a.gap.scoreDiff) - Math.abs(b.gap.scoreDiff);
+    });
+  } else if (mode === "scoreDesc"){
+    sorted = withGap.slice().sort((a,b)=>{
+      const sa = a.kind === "fiveYear" ? a.entry.joint.score : a.entry.score;
+      const sb = b.kind === "fiveYear" ? b.entry.joint.score : b.entry.score;
+      return sb - sa;
+    });
+  } else { // name
+    sorted = rows.slice().sort((a,b)=> a.entry.school.localeCompare(b.entry.school, "zh-Hant"));
+    return sorted;
+  }
+  return sorted.concat(withoutGap);
+}
+
+/* =========================
+   UI RENDER
+========================= */
+const el = id => document.getElementById(id);
+
+/* Purely visual: shows where a subject's current grade sits within the grade
+   family (high -> low). This is NOT a ranking of subjects and carries no
+   "weak subject" judgement — it only shows this one subject's own position. */
+function renderGradeLadder(current){
+  const order = ["A++","A+","A","B++","B+","B","C"];
+  return `<div class="grade-ladder" aria-hidden="true">${order.map((g,i)=>
+    (i>0 ? `<span class="ladder-arrow">→</span>` : '') +
+    `<span class="ladder-step${g===current?' current':''}">${g}</span>`
+  ).join('')}</div>`;
+}
+
+/* Renders the visual state of the gender selector (checked dot + "✓ " prefix
+   on the label text, not color alone) and keeps the underlying radio inputs
+   in sync so keyboard/assistive-tech users get the native radio semantics. */
+function renderGenderSelector(){
+  const selector = el("genderSelector");
+  if (!selector) return;
+  selector.querySelectorAll(".gender-option").forEach(opt=>{
+    const val = opt.getAttribute("data-gender");
+    const input = opt.querySelector("input");
+    const selected = gender === val;
+    input.checked = selected;
+    opt.classList.toggle("is-selected", selected);
+    const labelText = opt.querySelector(".gender-label-text");
+    labelText.textContent = (selected ? "✓ " : "") + (val === "male" ? "男生" : "女生");
+  });
+  const reminder = el("genderReminder");
+  if (reminder){
+    reminder.innerHTML = gender ? '' : `
+      <div class="incomplete-box">
+        <b>請先選擇性別</b>
+        系統才能正確判斷像市立高雄女中這類有性別限定資格的校系；性別選擇前，這類校系不會列入「已達門檻」的結果。
+      </div>`;
+  }
+}
+
+/* Spec section 34: whenever the student's five subjects are all "A", show a
+   dedicated explanation of why that becomes 30分／25點 and why 25點 is not a
+   second independent threshold. Purely computed from gradeToPoint/gradeToSubjectScore
+   — never hard-coded — so it stays correct if the grade table above ever changes. */
+function renderFiveAExplain(){
+  const box = el("fiveAExplain");
+  if (!box) return;
+  const allA = SUBJECTS.every(s => subjects[s.key] === "A");
+  if (!allA){ box.innerHTML = ''; return; }
+  const result = getCurrentResult();
+  const maxScore = SUBJECTS.length * 6;
+  const maxPoints = SUBJECTS.length * 7;
+  box.innerHTML = `
+    <div class="fivea-note">
+      <b>你的5A成績（國文、數學、英語、社會、自然皆為A）</b>
+      會考總積分 ${result.totalScore} / ${maxScore}；會考標示總積點 ${result.totalPoints} / ${maxPoints}。
+      比序時先比較總積分，因此不能把${result.totalPoints}點當成另一個必須「同時」達到的獨立門檻——
+      只要總積分已經比某校歷史參考位置高，即使積點較低，也不會因此被排除。
+    </div>`;
+}
+
+function renderSubjectCards(){
+  const container = el("subjectCards");
+  container.innerHTML = SUBJECTS.map(s=>{
+    const current = subjects[s.key];
+    const row1 = ["A++","A+","A"];
+    const row2 = ["B++","B+","B","C"];
+    const btn = g => `<button type="button" class="grade-btn${current===g?' active':''}" data-subject="${s.key}" data-grade="${g}" aria-pressed="${current===g}">${g}<span class="pt">${gradeToPoint(g)}點</span></button>`;
+    return `
+      <div class="subject-card">
+        <div class="subject-card-head">
+          <span class="name">${s.label}</span>
+          <span class="status ${current?'picked':''}">${current ? ('目前：'+current+'（'+gradeToPoint(current)+'點 / '+gradeToSubjectScore(current)+'分）') : '尚未選擇'}</span>
+        </div>
+        ${current ? renderGradeLadder(current) : ''}
+        <div class="grade-grid">
+          <div class="grade-row row1">${row1.map(btn).join('')}</div>
+          <div class="grade-row row2">${row2.map(btn).join('')}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  container.querySelectorAll(".grade-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const subject = b.getAttribute("data-subject");
+      const grade = b.getAttribute("data-grade");
+      subjects[subject] = grade;
+      saveSubjects();
+      renderAll();
+    });
+  });
+
+  const completionBox = el("completionBox");
+  const enteredCount = SUBJECTS.filter(s=>subjects[s.key]).length;
+  if (enteredCount < 5){
+    const missing = SUBJECTS.filter(s=>!subjects[s.key]).map(s=>s.label);
+    completionBox.innerHTML = `
+      <div class="incomplete-box">
+        <b>目前已輸入 ${enteredCount} / 5 科</b>
+        尚未輸入：${missing.join('、')}
+      </div>`;
+  } else {
+    completionBox.innerHTML = `
+      <div class="complete-box">
+        <div>✓ 成績計算完成</div>
+        <div>✓ 歷史門檻分析完成</div>
+        <div>✓ 可以開始進行提升模擬</div>
+      </div>`;
+  }
+}
+
+function renderDashboard(){
+  const result = getCurrentResult();
+  const dash = el("dashboard");
+  if (!result.complete){
+    dash.innerHTML = `<div class="dash-empty">請先完成五科等第輸入，這裡就會即時顯示你的總積點、總積分與可參考校系數量。</div>`;
+    return;
+  }
+  const eligible = getEligibleSchools(result.totalScore, result.totalPoints, gender);
+  const reachedCount = eligible.filter(r=>r.gap.filterStatus==="reached").length;
+  const nearCount = eligible.filter(r=>r.gap.filterStatus==="near").length;
+
+  dash.innerHTML = `
+    <div class="dash-grid">
+      <div class="dash-card">
+        <div class="label">五科總積分</div>
+        <div class="num">${result.totalScore}<small>分</small></div>
+      </div>
+      <div class="dash-card">
+        <div class="label">五科總積點</div>
+        <div class="num">${result.totalPoints}<small>點</small></div>
+      </div>
+      <div class="dash-card teal">
+        <div class="label">115年參考門檻已達</div>
+        <div class="num">${reachedCount}<small>個校系</small></div>
+      </div>
+      <div class="dash-card orange">
+        <div class="label">接近門檻</div>
+        <div class="num">${nearCount}<small>個校系</small></div>
+      </div>
+    </div>`;
+}
+
+function renderMyScores(){
+  const panel = el("myScoresPanel");
+  const rows = SUBJECTS.map(s=>{
+    const g = subjects[s.key];
+    const pt = g ? gradeToPoint(g) : 0;
+    const pct = g ? Math.round((pt/7)*100) : 0;
+    return `
+      <div class="score-row">
+        <span class="sname">${s.label}</span>
+        <span class="sgrade">${g || '—'}</span>
+        <span class="score-bar-track"><span class="score-bar-fill" style="width:${pct}%"></span></span>
+        <span class="spt">${g ? (pt+'點 / '+gradeToSubjectScore(g)+'分') : '尚未輸入'}</span>
+      </div>`;
+  }).join('');
+  panel.innerHTML = rows;
+}
+
+function renderSimulation(){
+  const container = el("simContainer");
+  const enteredCount = SUBJECTS.filter(s=>subjects[s.key]).length;
+  if (enteredCount < 5){
+    container.innerHTML = `<div class="dash-empty">完成五科輸入後，這裡會針對每一科分別模擬「提升一級」的效果。</div>`;
+    return;
+  }
+  const cards = SUBJECTS.map(s=>{
+    const r = simulateSubjectUpgrade(s.key);
+    if (r.cannotUpgrade){
+      return `
+        <div class="sim-card">
+          <div class="sim-head"><h4>${s.label}</h4></div>
+          <div class="sim-maxed">目前已是最高等第（A++），此科無法再提升。</div>
+        </div>`;
+    }
+    const cmp = compareResults(r);
+    return `
+      <div class="sim-card">
+        <div class="sim-head">
+          <h4>${s.label}</h4>
+          <div class="sim-arrow"><span class="grade-pill">${r.currentGrade}</span>→<span class="grade-pill up">${r.upgradedGrade}</span></div>
+        </div>
+        <table class="sim-metric-table">
+          <tr><td class="mlabel">項目</td><td class="mval">目前</td><td class="mval">提升後</td></tr>
+          ${cmp.slice(0,3).map(row=>`<tr><td class="mlabel">${row.label}</td><td class="mval">${row.current}</td><td class="mval">${row.simulated}</td></tr>`).join('')}
+        </table>
+        <div style="text-align:center;">
+          <span class="big-plus">＋${r.newSchoolCount} 個可參考校系</span>
+        </div>
+        <div class="sim-breakdown">
+          ${CATEGORY_ORDER.map(c=>`<div class="sim-breakdown-row"><span>新增${CATEGORY_LABELS[c]}</span><b>＋${r.newSchoolsByCategory[c]}</b></div>`).join('')}
+        </div>
+        ${r.newSchools.length > 0 ? `
+        <details class="sim-newlist">
+          <summary>新增的 ${r.newSchools.length} 個可參考校系</summary>
+          <ul>
+            ${r.newSchools.map(e=>`<li><b>${e.school}</b>　${e.dept}${e.isFiveYearJoint ? '（五專・聯合免試）' : ''}<br>115最低：${e.score}分／${e.points}點　我的模擬：${r.simulatedScore}分／${r.simulatedPoints}點</li>`).join('')}
+          </ul>
+        </details>` : `<div class="na-text">此次模擬暫無新增校系。</div>`}
+      </div>`;
+  }).join('');
+  container.innerHTML = `<div class="sim-grid">${cards}</div>`;
+}
+
+function renderRankHighlight(){
+  const box = el("rankHighlight");
+  if (!box) return;
+  const enteredCount = SUBJECTS.filter(s=>subjects[s.key]).length;
+  if (enteredCount < 5){ box.innerHTML = ''; return; }
+  const ranking = getUpgradeRanking();
+  if (!ranking.length){
+    box.innerHTML = `<div class="highlight-card highlight-empty">目前五科皆已達 A++，沒有可再提升的等第。</div>`;
+    return;
+  }
+  const top = ranking[0];
+  box.innerHTML = `
+    <div class="highlight-card">
+      <div class="highlight-kicker">如果目標是增加升學選擇</div>
+      <div class="highlight-main">
+        <span class="highlight-label">第一優先</span>
+        ${top.label}
+        <span class="grade-pill">${top.result.currentGrade}</span>→<span class="grade-pill up">${top.result.upgradedGrade}</span>
+      </div>
+      <div class="highlight-metrics">
+        <span>＋${top.result.deltaPoints} 積點</span>
+        <span>＋${top.result.deltaScore} 積分</span>
+        <span>＋${top.result.newSchoolCount} 個歷史參考校系</span>
+      </div>
+      <div class="highlight-note">這只是依115年歷史資料計算的模擬結果，不代表正式升學策略或錄取保證。</div>
+    </div>`;
+}
+
+function renderRanking(){
+  renderRankHighlight();
+  const list = el("rankList");
+  const enteredCount = SUBJECTS.filter(s=>subjects[s.key]).length;
+  if (enteredCount < 5){
+    list.innerHTML = `<li class="empty-note">完成五科輸入後，這裡會顯示提升效益排行榜。</li>`;
+    return;
+  }
+  const ranking = getUpgradeRanking();
+  const maxedOut = SUBJECTS.filter(s=>subjects[s.key] === "A++");
+  let html = ranking.map((r,i)=>`
+    <li class="rank-item rank-item-detail">
+      <div class="rank-top">
+        <span class="rank-num">${i+1}</span>
+        <span class="rank-name">${r.label}</span>
+        <span class="grade-pill">${r.result.currentGrade}</span>→<span class="grade-pill up">${r.result.upgradedGrade}</span>
+      </div>
+      <div class="rank-mid">
+        <span>積點 ＋${r.result.deltaPoints}</span>
+        <span>積分 ＋${r.result.deltaScore}</span>
+        <span class="rank-count">＋${r.result.newSchoolCount} 個校系</span>
+      </div>
+      <div class="rank-breakdown">${formatCategoryBreakdown(r.result.newSchoolsByCategory)}</div>
+    </li>`).join('');
+  if (maxedOut.length){
+    html += `<li class="rank-item"><span class="rank-num">—</span><span class="rank-name">${maxedOut.map(s=>s.label).join('、')}</span><span class="rank-maxed">目前已是最高等第</span></li>`;
+  }
+  list.innerHTML = html || `<li class="empty-note">目前五科皆已達最高等第。</li>`;
+}
+
+let exploreCategoryFilter = "all";
+function renderExplore(){
+  const tabs = el("exploreTabs");
+  const cats = [{key:"all", label:"全部"}, ...CATEGORY_ORDER.map(c=>({key:c, label:CATEGORY_LABELS[c]}))];
+  tabs.innerHTML = cats.map(c=>`<button type="button" class="tab-btn${exploreCategoryFilter===c.key?' active':''}" data-cat="${c.key}">${c.label}</button>`).join('');
+  tabs.querySelectorAll(".tab-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      exploreCategoryFilter = b.getAttribute("data-cat");
+      renderExplore();
+    });
+  });
+
+  const notice = el("exploreFiveYearNotice");
+  if (notice){
+    notice.innerHTML = exploreCategoryFilter === "fiveYearJuniorCollege"
+      ? `⚠️ 五專資料與高中職落點分析制度不同：這裡只用「聯合免試」總積分／總積點與你的五科成績比對，「優先免試」計算基礎不同，不納入這個分類，請至下方完整資料查看。`
+      : '';
+  }
+
+  const columns = el("exploreColumns");
+  const result = getCurrentResult();
+  if (!result.complete){
+    columns.innerHTML = `<div class="dash-empty" style="grid-column:1/-1;">完成五科輸入後，這裡會依門檻狀態自動分類校系。</div>`;
+    return;
+  }
+  const eligible = getEligibleSchools(result.totalScore, result.totalPoints, gender)
+    .filter(r => exploreCategoryFilter === "all" || r.entry.category === exploreCategoryFilter);
+
+  const groups = {
+    reached: eligible.filter(r=>r.gap.filterStatus==="reached"),
+    near: eligible.filter(r=>r.gap.filterStatus==="near"),
+    gap: eligible.filter(r=>r.gap.filterStatus==="not_reached")
+  };
+  const meta = [
+    {key:"reached", cls:"reached", title:"目前已達歷史門檻"},
+    {key:"near", cls:"near", title:"接近歷史門檻"},
+    {key:"gap", cls:"gap", title:"目前尚有差距"}
+  ];
+  columns.innerHTML = meta.map(m=>{
+    const items = groups[m.key];
+    return `
+      <div class="status-col ${m.cls}">
+        <h4><span class="status-dot"></span>${m.title}<span class="count">${items.length}</span></h4>
+        <ul class="mini-list">
+          ${items.length ? items.slice(0,60).map(r=>`
+            <li>
+              <span class="mn">${r.entry.school}</span>
+              <span class="md">${r.entry.dept}${r.entry.categoryLabel ? '・'+r.entry.categoryLabel : ''}</span>
+            </li>`).join('') : '<li class="empty-note" style="border:none; padding:4px 0;">目前沒有符合的校系</li>'}
+        </ul>
+      </div>`;
+  }).join('');
+}
+
+/* Shared renderer for a "school's historical score/points vs. my score/points"
+   block, used by both standard schools and the five-year joint-exam figures.
+   Encodes the layered rule directly in the markup: when the student is already
+   ahead on 總積分 (scoreDiff !== 0), the total-point comparison is shown as
+   context only — a tier-note makes explicit that it can't demote a school
+   already won at the score layer. */
+function renderComparisonBlock(gap, schoolScore, schoolPoints, scoreLabel, pointLabel){
+  const scoreOk = gap.scoreDiff >= 0;
+  const pointOk = gap.pointDiff >= 0;
+  const scoreText = scoreOk ? (gap.scoreDiff > 0 ? `✓ 高於＋${gap.scoreDiff}` : '✓ 同分') : `還差＋${-gap.scoreDiff}`;
+  const pointText = pointOk ? (gap.pointDiff > 0 ? `✓ 高於＋${gap.pointDiff}` : '✓ 同分') : `還差＋${-gap.pointDiff}`;
+  let tierNote;
+  if (!gap.sameScore){
+    tierNote = gap.comparison >= 0
+      ? `<div class="tier-note tier-win">✓ 總積分已高於歷史參考位置，不會因為總積點較低而被排除。</div>`
+      : `<div class="tier-note">總積分尚未達到歷史參考位置，需先提升總積分。</div>`;
+  } else {
+    tierNote = `<div class="tier-note">總積分同分，比序依總積點判斷。</div>`;
+  }
+  return `
+    <div class="metric-line"><span class="mname">${scoreLabel}</span><span class="mstat">${schoolScore}分</span></div>
+    <div class="metric-line"><span class="mname">我的總積分</span><span class="mstat ${scoreOk?'ok':'gapv'}">${scoreText}</span></div>
+    <div class="metric-line"><span class="mname">${pointLabel}</span><span class="mstat">${schoolPoints}點</span></div>
+    <div class="metric-line"><span class="mname">我的總積點</span><span class="mstat ${pointOk?'ok':'gapv'}">${pointText}</span></div>
+    ${tierNote}`;
+}
+
+function renderSchoolCard(row){
+  const e = row.entry;
+  const catLabel = e.categoryLabel || CATEGORY_LABELS[e.category];
+  if (row.kind === "fiveYear"){
+    const priorityText = e.priority.status === "valid"
+      ? `優先免試積分：${e.priority.value}`
+      : (e.priority.status === "no_data" ? `優先免試：${e.priority.rawValue}（無有效最低錄取門檻資料）` : `優先免試：資料格式特殊，請參考原始資料`);
+    let jointBlock;
+    if (e.joint.status === "valid"){
+      const gap = row.gap;
+      if (gap && gap.genderRestricted){
+        jointBlock = `
+          <span class="badge ${gap.badgeClass}">${gap.badgeLabel}</span>
+          <div class="nodata-text">${gap.genderRestriction === 'female' ? '本校系依規定僅開放女性學生依此門檻計算資格。' : '本校系依規定僅開放男性學生依此門檻計算資格。'}</div>`;
+      } else if (gap){
+        jointBlock = `
+          <span class="badge ${gap.badgeClass}">${gap.badgeLabel}</span>
+          ${renderComparisonBlock(gap, e.joint.score, e.joint.points, "聯合免試總積分", "聯合免試總積點")}`;
+      } else {
+        jointBlock = `<div class="nodata-text">聯合免試總積分：${e.joint.score}分／總積點：${e.joint.points}點（完成五科輸入及性別選擇後即可比對）</div>`;
+      }
+    } else if (e.joint.status === "no_data"){
+      jointBlock = `<div class="nodata-text">聯合免試：無有效最低錄取門檻資料</div>`;
+    } else {
+      jointBlock = `<div class="special-text">聯合免試：資料格式特殊，請參考原始資料</div>`;
+    }
+    return `
+      <div class="school-card">
+        <span class="cat-tag">${catLabel}</span>
+        <h5>${e.school}</h5>
+        <div class="dept">${e.dept}</div>
+        <div class="nodata-text">${priorityText}</div>
+        ${jointBlock}
+        <div class="na-text">此校系「優先免試」資料不適用目前高中職五科門檻演算法，請參考原始招生資訊。</div>
+      </div>`;
+  }
+
+  if (e.status === "no_data"){
+    return `
+      <div class="school-card">
+        <span class="cat-tag">${catLabel}</span>
+        <h5>${e.school}</h5>
+        <div class="dept">${e.dept}</div>
+        <span class="badge nodata">無有效最低錄取門檻資料</span>
+        <div class="nodata-text">原始資料標示為「${e.rawScore}」，已排除在門檻比對之外。</div>
+      </div>`;
+  }
+  if (e.status === "special"){
+    return `
+      <div class="school-card">
+        <span class="cat-tag">${catLabel}</span>
+        <h5>${e.school}</h5>
+        <div class="dept">${e.dept}</div>
+        <span class="badge special">資料格式特殊</span>
+        <div class="special-text">原始資料：積分「${e.rawScore}」／積點「${e.rawPoints}」，請參考原始資料。</div>
+      </div>`;
+  }
+  // valid
+  const gap = row.gap;
+  if (!gap){
+    return `
+      <div class="school-card">
+        <span class="cat-tag">${catLabel}</span>
+        <h5>${e.school}</h5>
+        <div class="dept">${e.dept}</div>
+        <div class="metric-line"><span class="mname">115年最低總積分</span><span class="mstat">${e.score}分</span></div>
+        <div class="metric-line"><span class="mname">115年最低總積點</span><span class="mstat">${e.points}點</span></div>
+        <div class="nodata-text">完成五科輸入及性別選擇後，即可看到你的落點比對結果。</div>
+      </div>`;
+  }
+  if (gap.genderRestricted){
+    return `
+      <div class="school-card">
+        <span class="cat-tag">${catLabel}</span>
+        <h5>${e.school}</h5>
+        <div class="dept">${e.dept}</div>
+        <span class="badge ${gap.badgeClass}">${gap.badgeLabel}</span>
+        <div class="metric-line"><span class="mname">115年最低總積分</span><span class="mstat">${e.score}分</span></div>
+        <div class="metric-line"><span class="mname">115年最低總積點</span><span class="mstat">${e.points}點</span></div>
+        <div class="nodata-text">${gap.genderRestriction === 'female' ? '本校系依規定僅開放女性學生依此門檻計算資格。' : '本校系依規定僅開放男性學生依此門檻計算資格。'}</div>
+      </div>`;
+  }
+  return `
+    <div class="school-card">
+      <span class="cat-tag">${catLabel}</span>
+      <h5>${e.school}</h5>
+      <div class="dept">${e.dept}</div>
+      <span class="badge ${gap.badgeClass}">${gap.badgeLabel}</span>
+      ${renderComparisonBlock(gap, e.score, e.points, "115年最低總積分", "115年最低總積點")}
+    </div>`;
+}
+
+function populateCategoryFilter(){
+  const sel = el("filterCategory");
+  sel.innerHTML = `<option value="all">學校類型：全部</option>` +
+    CATEGORY_ORDER.map(c=>`<option value="${c}">${CATEGORY_LABELS[c]}</option>`).join('');
+}
+
+function renderSchoolResults(){
+  const keyword = el("searchInput").value;
+  const cat = el("filterCategory").value;
+  const status = el("filterStatus").value;
+  const sortMode = el("sortSelect").value;
+
+  let rows = buildDisplayList();
+  rows = rows.filter(r => matchesSearch(r, keyword) && matchesCategory(r, cat) && matchesStatus(r, status));
+  rows = sortRows(rows, sortMode);
+
+  el("resultCount").textContent = `共 ${rows.length} 筆資料`;
+  el("schoolGrid").innerHTML = rows.length
+    ? rows.map(renderSchoolCard).join('')
+    : `<div class="dash-empty" style="grid-column:1/-1;">找不到符合條件的校系，試著調整搜尋或篩選條件。</div>`;
+}
+
+function renderDataStats(){
+  const box = el("dataStats");
+  if (!box) return;
+  const stats = getDataStats();
+  box.innerHTML = `
+    <div class="stats-grid">
+      ${CATEGORY_ORDER.map(c=>`
+        <div class="stats-item">
+          <span class="stats-label">${CATEGORY_LABELS[c]}</span>
+          <span class="stats-num">${stats.counts[c]}</span>
+          <span class="stats-unit">筆</span>
+        </div>`).join('')}
+    </div>
+    <div class="stats-total">共 ${stats.total} 筆歷史資料</div>`;
+}
+
+function renderVersionBadge(){
+  const badge = el("versionBadge");
+  if (badge) badge.textContent = `資料版本：${DATA_YEAR}年歷史最低錄取資料｜系統版本：v${SYSTEM_VERSION}`;
+}
+
+function renderAll(){
+  renderGenderSelector();
+  renderSubjectCards();
+  renderFiveAExplain();
+  renderDashboard();
+  renderMyScores();
+  renderSimulation();
+  renderRanking();
+  renderExplore();
+  renderSchoolResults();
+  renderDataStats();
+  renderVersionBadge();
+}
+
+/* =========================
+   EVENT HANDLERS
+========================= */
+function initEventHandlers(){
+  document.querySelectorAll("#genderSelector input[name='gender']").forEach(input=>{
+    input.addEventListener("change", ()=>{
+      gender = input.value;
+      saveSubjects();
+      renderAll(); // re-runs eligibility immediately, no page reload needed
+    });
+  });
+  el("btnReenter").addEventListener("click", ()=>{
+    clearSubjects();
+    renderAll();
+    el("inputSection").scrollIntoView({behavior:"smooth"});
+  });
+  el("btnClear").addEventListener("click", ()=>{
+    if (confirm("確定要清除已儲存在此瀏覽器的五科成績嗎？此動作不會影響學校資料。")){
+      clearSubjects();
+      renderAll();
+    }
+  });
+  el("searchInput").addEventListener("input", renderSchoolResults);
+  el("filterCategory").addEventListener("change", renderSchoolResults);
+  el("filterStatus").addEventListener("change", renderSchoolResults);
+  el("sortSelect").addEventListener("change", renderSchoolResults);
+}
+
+/* =========================
+   INIT
+========================= */
+function init(){
+  loadSubjects();
+  populateCategoryFilter();
+  initEventHandlers();
+  renderAll();
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+
+<!--
+=========================
+FIREBASE (reserved for future use — Hosting / data sync / teacher dashboard / stats)
+This project currently runs entirely client-side with localStorage. Do NOT put a real API key here.
+=========================
+<script type="module">
+  // import { initializeApp } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-app.js";
+  // const firebaseConfig = {
+  //   apiKey: "YOUR_API_KEY",
+  //   authDomain: "YOUR_AUTH_DOMAIN",
+  //   projectId: "YOUR_PROJECT_ID",
+  //   storageBucket: "YOUR_STORAGE_BUCKET",
+  //   messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  //   appId: "YOUR_APP_ID"
+  // };
+  // const app = initializeApp(firebaseConfig);
+</script>
+-->
+</body>
+</html>
