@@ -230,6 +230,7 @@ button{font-family:inherit;}
 
 .target-analysis-box{margin-top:18px;padding:16px;border:2px solid #D9DFEE;border-radius:var(--radius-l);background:linear-gradient(145deg,#FBFCFF,#F7FAFC);scroll-margin-top:80px;}
 .target-analysis-title{font-family:var(--serif);font-size:1.08rem;font-weight:900;color:var(--indigo-deep);margin-bottom:10px;}
+.target-principle-note{margin-top:8px;padding:8px 10px;background:var(--indigo-tint,#EEF1FF);border-radius:var(--radius-s);font-size:.72rem;line-height:1.6;color:var(--indigo-deep);}
 .target-gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0;}
 .target-gap-card{background:#fff;border-radius:var(--radius-s);padding:10px;border:1px solid var(--hairline);}
 .target-gap-card strong{display:block;font-size:.8rem}.target-gap-card small{display:block;margin-top:3px;color:var(--ink-soft);line-height:1.5;}
@@ -692,14 +693,6 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
 .highlight-note{font-size:.8rem; color:#D6DAF3;}
 
 
-.strategy-note{margin-top:10px;padding:9px 11px;border-radius:var(--radius-m);background:#F7FBF9;border:1px dashed #BFDAD4;color:var(--ink-soft);font-size:.73rem;line-height:1.6;}
-.pref-cap{display:block;margin-top:6px;color:#7C8499;font-size:.64rem;line-height:1.35;}
-.strategy-feasibility{display:inline-block;margin-left:4px;padding:2px 6px;border-radius:999px;background:#E7F7F2;color:#087565;font-size:.62rem;font-weight:900;}
-.strategy-feasibility.stretch{background:#FFF0D8;color:#9A5A12;}
-.strategy-one-shot .grade{font-weight:900;}
-.designer-credit{margin:5px 0 0;color:#D9DDF2;font-size:.72rem;font-weight:800;letter-spacing:.04em;}
-.footer-designer{display:inline-block;margin-bottom:10px;padding:5px 9px;border:1px solid rgba(255,255,255,.18);border-radius:999px;color:#E6E9F8;font-size:.75rem;font-weight:900;}
-
 /* =========================
    PERSONALIZED STRATEGY
 ========================= */
@@ -759,7 +752,6 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
     <h1>116學年度<br>高雄區免試入學<br>落點預測</h1>
     <p class="sub">輸入五科積點等第，看看目前成績與115年歷史錄取門檻的差距。</p>
     <p class="tag">再進步一級，會多哪些選擇？</p>
-    <p class="designer-credit">陽明國中・王高帆老師設計</p>
     <div class="writing-note">
       ※ 116學年度寫作測驗目前尚未列入積點採計，因此本系統暫不納入計算。系統僅計算國文、數學、英語、社會、自然五科。
     </div>
@@ -825,7 +817,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
               <div class="strategy-head">
                 <div>
                   <h4>🧭 我的學習策略</h4>
-                  <p>告訴系統每科目前的強弱，以及你想採用的升學策略。系統會直接產生「目前等第 → 建議目標等第」，<strong>同一科只出現一次</strong>。</p>
+                  <p>告訴系統每科目前的強弱，以及你想採用的升學策略。<strong>志願客觀差距永遠優先</strong>，強弱科只用來協助選擇更適合的達標路徑。</p>
                 </div>
                 <span class="strategy-badge">個人化導航</span>
               </div>
@@ -959,7 +951,6 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
 
 <footer>
   <div class="wrap">
-    <div class="footer-designer">陽明國中 王高帆 老師設計</div>
     <h3>資料來源與使用說明</h3>
     <ul>
       <li>本系統使用115年高雄區高中職最低錄取分數參考資料作為歷史門檻參考。</li>
@@ -980,7 +971,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
    都從這兩個常數輸出，未來換成116年正式資料時，只需要改這裡。
 ========================= */
 const DATA_YEAR = 115;
-const SYSTEM_VERSION = "3.6";
+const SYSTEM_VERSION = "3.5";
 
 /* =========================
    SCHOOL DATA (raw, transcribed as-is from Kaohsiung_HighSchool_Scores_2026.xlsx)
@@ -1842,13 +1833,33 @@ function simulateTargetUpgrade(subjectKey){
   return {subjectKey, currentGrade, nextGrade, score, points};
 }
 
+/* =========================
+   志願達標：唯一的中央判斷函式（Single Source of Truth）
+   -------------------------------------------------------
+   總積分優先；總積分同分時，才比較總積點。
+   絕對不可使用「score>=target.score && points>=target.points」
+   這種雙門檻 AND 判斷 —— 全系統所有志願達標判斷都必須呼叫這裡。
+========================= */
+function isTargetReached(score, points, target){
+  if (score > target.score) return true;
+  if (score < target.score) return false;
+  return points >= target.points;
+}
+
 function compareTargetThreshold(score, points, target){
+  // 純粹依「總積分優先、同分才比總積點」分層比序，reached 一律透過
+  // isTargetReached() 取得，不在此處重新定義達標邏輯。
+  const scoreGap = score - target.score;   // 正值＝總積分已勝出，負值＝還差多少
+  const pointGap = points - target.points; // 正值＝總積點已勝出，負值＝還差多少
+  const reached = isTargetReached(score, points, target);
+  const compareLayer = score === target.score ? "point" : "score";
   return {
-    scoreGap: Math.max(0, target.score - score),
-    pointGap: Math.max(0, target.points - points),
+    reached,
+    compareLayer,          // "score"：由總積分決定勝負；"point"：總積分同分，進入總積點比序
+    scoreGap,
+    pointGap,
     scoreReached: score >= target.score,
-    pointReached: points >= target.points,
-    bothReached: score >= target.score && points >= target.points
+    pointReached: points >= target.points
   };
 }
 
@@ -1859,222 +1870,139 @@ function getSubjectStrengthWeight(v){ return v==="weak" ? 3 : v==="normal" ? 2 :
 function getStrategyGoalLabel(){
   return ({fastest:"🚀 最快達標", balanced:"⚖️ 平均提升各科", weakFirst:"🎯 優先突破弱科", safe:"🛡️ 最保險策略"})[strategyGoal] || "🚀 最快達標";
 }
-
-/*
- * 個人化策略的核心原則（v3.6）
- * 1. 每一科只出現一次：直接給「目前等第 → 建議目標等第」，不再拆成 B++→A→A+→A++ 三次。
- * 2. 先看客觀門檻，再看提升效益，再看學生自評，最後才用科目順序微調。
- * 3. 自評不是「弱科優先」開關，而是「可行性／難度」資訊。
- * 4. 強科可把 A++ 視為主要可行目標；普通科以 A+ 為保守目標；弱科以 A 為保守目標。
- *    若保守方案無法達標，才允許普通科挑戰 A++、弱科挑戰 A+，並明確標示「挑戰級」。
- */
-function getStrengthProfile(strength){
-  if(strength==="strong") return {label:"強科", conservativeCap:"A++", stretchCap:"A++", difficulty:1};
-  if(strength==="weak") return {label:"弱科", conservativeCap:"A", stretchCap:"A+", difficulty:3};
-  return {label:"普通", conservativeCap:"A+", stretchCap:"A++", difficulty:2};
-}
-function getGradeIndex(grade){ return GRADE_ORDER.indexOf(grade); }
-function getSubjectUpgradeCandidate(subjectKey, targetGrade, mode="conservative"){
-  const from=subjects[subjectKey];
-  if(!from || !targetGrade) return null;
-  const fromIdx=getGradeIndex(from), toIdx=getGradeIndex(targetGrade);
-  if(fromIdx<0 || toIdx<=fromIdx) return null;
-  const simulated={...subjects,[subjectKey]:targetGrade};
-  const deltaScore=calculateTotalScore(simulated)-calculateTotalScore(subjects);
-  const deltaPoints=calculateTotalPoints(simulated)-calculateTotalPoints(subjects);
-  const strength=subjectStrength[subjectKey];
-  const profile=getStrengthProfile(strength);
-  const jump=toIdx-fromIdx;
-  const difficulty=jump*profile.difficulty;
+function simulateGradeState(state, subjectKey){
+  const current = state[subjectKey];
+  if (!current || current === "A++") return null;
+  const next = getNextGrade(current);
+  const simulated = {...state, [subjectKey]:next};
   return {
     subjectKey,
-    subject:SUBJECTS.find(s=>s.key===subjectKey)?.label || subjectKey,
-    from,
-    to:targetGrade,
+    from:current,
+    to:next,
     score:calculateTotalScore(simulated),
     points:calculateTotalPoints(simulated),
-    deltaScore,
-    deltaPoints,
-    jump,
-    difficulty,
-    strength,
-    mode,
-    feasibility: mode==="conservative" ? "建議級" : "挑戰級"
+    deltaScore:calculateTotalScore(simulated)-calculateTotalScore(state),
+    deltaPoints:calculateTotalPoints(simulated)-calculateTotalPoints(state)
   };
 }
-function getAllowedTargetGrades(subjectKey, mode="conservative"){
-  const from=subjects[subjectKey];
-  if(!from) return [];
-  const profile=getStrengthProfile(subjectStrength[subjectKey]);
-  const cap=mode==="stretch" ? profile.stretchCap : profile.conservativeCap;
-  const start=getGradeIndex(from), end=getGradeIndex(cap);
-  if(start<0 || end<=start) return [];
-  return GRADE_ORDER.slice(start+1,end+1);
+
+function getShortestTargetPath(target, result){
+  if (!target || !result.complete) return null;
+  if (isTargetReached(result.totalScore, result.totalPoints, target)) return [];
+  const startState = {...subjects};
+  const startKey = stateKey(startState);
+  const queue = [{state:startState, path:[]}];
+  const visited = new Set([startKey]);
+  while(queue.length){
+    const node=queue.shift();
+    for(const s of SUBJECTS){
+      const sim=simulateGradeState(node.state,s.key);
+      if(!sim) continue;
+      const nextState={...node.state,[s.key]:sim.to};
+      const nextPath=[...node.path,sim];
+      if(isTargetReached(sim.score, sim.points, target)) return nextPath;
+      const key=stateKey(nextState);
+      if(!visited.has(key)){ visited.add(key); queue.push({state:nextState,path:nextPath}); }
+    }
+  }
+  return null;
 }
-function comparePlan(a,b,target,strategyMode){
-  // 第一優先：是否真的達到志願客觀門檻。
-  const aBoth=a.score>=target.score && a.points>=target.points;
-  const bBoth=b.score>=target.score && b.points>=target.points;
-  if(aBoth!==bBoth) return aBoth ? -1 : 1;
 
-  // 第二優先：成績提升效益。仍未達標時，先縮小「總積分」缺口，再縮小「總積點」缺口。
-  const aScoreGap=Math.max(0,target.score-a.score), bScoreGap=Math.max(0,target.score-b.score);
-  const aPointGap=Math.max(0,target.points-a.points), bPointGap=Math.max(0,target.points-b.points);
-  if(aScoreGap!==bScoreGap) return aScoreGap-bScoreGap;
-  if(aPointGap!==bPointGap) return aPointGap-bPointGap;
-
-  // 第三優先：學生選擇的策略模式。
-  if(strategyMode==="balanced"){
-    // 平均提升：在客觀結果相同時，讓更多不同科目都有實質提升。
-    if(a.count!==b.count) return b.count-a.count;
-    if(a.difficulty!==b.difficulty) return a.difficulty-b.difficulty;
-  }else if(strategyMode==="weakFirst"){
-    // 弱科只在客觀結果接近時介入。
-    if(a.weakCount!==b.weakCount) return b.weakCount-a.weakCount;
-    if(a.difficulty!==b.difficulty) return a.difficulty-b.difficulty;
-  }else if(strategyMode==="safe"){
-    // 保險：達標後優先保留較大的客觀餘裕，再控制努力難度。
-    const aMargin=(a.score-target.score)*10+(a.points-target.points);
-    const bMargin=(b.score-target.score)*10+(b.points-target.points);
-    if(aMargin!==bMargin) return bMargin-aMargin;
-    if(a.difficulty!==b.difficulty) return a.difficulty-b.difficulty;
+function getStrategyScore(sim, current, target, baseline){
+  const scoreGap=Math.max(0,target ? target.score-current.score : 0);
+  const pointGap=Math.max(0,target ? target.points-current.points : 0);
+  // reachesScore / reachesPoints 僅作為策略評分的輔助加權訊號，
+  // 「是否已達標」一律由 isTargetReached() 這個唯一中央函式決定。
+  const reachesScore=target ? sim.score>=target.score : false;
+  const reachesPoints=target ? sim.points>=target.points : false;
+  const reached=target ? isTargetReached(sim.score, sim.points, target) : false;
+  const subject=SUBJECTS.find(s=>s.key===sim.subjectKey);
+  const idx=SUBJECTS.findIndex(s=>s.key===sim.subjectKey);
+  const strength=getSubjectStrengthWeight(subjectStrength[sim.subjectKey]);
+  const deltaNewScore=sim.deltaScore;
+  const deltaNewPoints=sim.deltaPoints;
+  let score=0;
+  // Objective target layer: the dominant component.
+  if(target){
+    if(reached) score+=10000;
+    if(reachesScore) score+=3500;
+    if(reachesPoints) score+=1800;
+    score+=Math.min(1200, Math.max(0, deltaNewScore)*420);
+    score+=Math.min(600, Math.max(0, deltaNewPoints)*120);
+    score-=Math.min(700, Math.max(0, scoreGap)*35);
+    score-=Math.min(500, Math.max(0, pointGap)*18);
   }else{
-    // 最快達標：每科只推薦一個最終目標，優先最少科目。
-    if(a.count!==b.count) return a.count-b.count;
-    if(a.difficulty!==b.difficulty) return a.difficulty-b.difficulty;
+    score += deltaNewScore*420 + deltaNewPoints*120;
   }
-
-  // 第四優先：提升效益；第五優先：自評可行性；最後才用固定科目順序。
-  if(a.deltaScore!==b.deltaScore) return b.deltaScore-a.deltaScore;
-  if(a.deltaPoints!==b.deltaPoints) return b.deltaPoints-a.deltaPoints;
-  if(a.strongCount!==b.strongCount) return b.strongCount-a.strongCount;
-  return a.orderKey-b.orderKey;
-}
-function buildPlanFromCandidates(target,strategyMode="fastest",capMode="conservative"){
-  const baseScore=calculateTotalScore(subjects), basePoints=calculateTotalPoints(subjects);
-  let best=null;
-
-  /*
-   * DFS 直接枚舉「每科是否提升，以及若提升要一次到哪個最終等第」。
-   * 因為每個科目在 DFS 中只處理一次，所以輸出的每科永遠只有一筆建議。
-   */
-  function dfs(i,working,steps){
-    if(i===SUBJECTS.length){
-      const score=calculateTotalScore(working), points=calculateTotalPoints(working);
-      const picked=steps.filter(Boolean);
-      const plan={
-        steps:picked,
-        score,points,
-        count:picked.length,
-        difficulty:picked.reduce((n,x)=>n+x.difficulty,0),
-        deltaScore:score-baseScore,
-        deltaPoints:points-basePoints,
-        weakCount:picked.filter(x=>x.strength==="weak").length,
-        strongCount:picked.filter(x=>x.strength==="strong").length,
-        orderKey:picked.reduce((n,x)=>n+SUBJECTS.findIndex(s=>s.key===x.subjectKey)*10,0)
-      };
-      if(!best || comparePlan(plan,best,target,strategyMode)<0) best=plan;
-      return;
-    }
-
-    const subject=SUBJECTS[i];
-    // 選擇「這科維持不變」。
-    dfs(i+1,working,[...steps,null]);
-
-    // 選擇「這科一次到位到某個目標等第」。
-    const from=working[subject.key];
-    const allowed=getAllowedTargetGrades(subject.key,capMode);
-    for(const targetGrade of allowed){
-      const simulated={...working,[subject.key]:targetGrade};
-      const profile=getStrengthProfile(subjectStrength[subject.key]);
-      const jump=getGradeIndex(targetGrade)-getGradeIndex(from);
-      const candidate={
-        subjectKey:subject.key,
-        subject:subject.label,
-        from,
-        to:targetGrade,
-        score:calculateTotalScore(simulated),
-        points:calculateTotalPoints(simulated),
-        deltaScore:calculateTotalScore(simulated)-calculateTotalScore(working),
-        deltaPoints:calculateTotalPoints(simulated)-calculateTotalPoints(working),
-        jump,
-        difficulty:jump*profile.difficulty,
-        strength:subjectStrength[subject.key],
-        feasibility:capMode==="conservative"?"建議級":"挑戰級"
-      };
-      dfs(i+1,simulated,[...steps,candidate]);
-    }
-  }
-  dfs(0,{...subjects},[]);
-  return best;
+  // Goal-specific layer, intentionally smaller than objective target effect.
+  if(strategyGoal==="fastest") score += (reached ? 900 : 0) - idx*2;
+  if(strategyGoal==="balanced") score += (6-strength)*45 - idx*2;
+  if(strategyGoal==="weakFirst") score += strength*115 - idx*2;
+  if(strategyGoal==="safe") score += (reached?500:0) + Math.min(300,deltaNewScore*80+deltaNewPoints*30) - idx*2;
+  return score;
 }
 
-function addPlanReasons(plan,target){
-  if(!plan) return null;
-  const score0=calculateTotalScore(subjects), point0=calculateTotalPoints(subjects);
-  let running={...subjects};
-  const steps=plan.steps.map((step,i)=>{
-    const beforeScore=calculateTotalScore(running), beforePoints=calculateTotalPoints(running);
-    const after={...running,[step.subjectKey]:step.to};
-    const afterScore=calculateTotalScore(after), afterPoints=calculateTotalPoints(after);
-    const scoreGapBefore=Math.max(0,target.score-beforeScore), pointGapBefore=Math.max(0,target.points-beforePoints);
-    const reachesBoth=afterScore>=target.score && afterPoints>=target.points;
-    let reason;
-    if(reachesBoth) reason=`本次直接完成志願門檻；原本還差 ${scoreGapBefore} 分／${pointGapBefore} 點。`;
-    else if(scoreGapBefore>0 && step.deltaScore>0) reason=`目前積分仍是主要缺口，本次一次提升可增加＋${step.deltaScore} 積分／＋${step.deltaPoints} 積點。`;
-    else if(pointGapBefore>0 && step.deltaPoints>0) reason=`積分已接近／達標，這一步主要補足＋${step.deltaPoints} 積點。`;
-    else reason=`客觀效益相近後，再依你的${getSubjectStrengthLabel(step.strength)}與策略模式微調。`;
-    running=after;
-    return {...step,order:i,score:afterScore,points:afterPoints,reason,reachesBoth};
-  });
-  const final=steps.length?steps[steps.length-1]:{score:score0,points:point0};
-  return {steps,final:{score:final.score,points:final.points}};
-}
 function buildPersonalizedStrategy(target,result){
-  if(!result.complete || !target) return null;
-  const scoreGap=Math.max(0,target.score-result.totalScore);
-  const pointGap=Math.max(0,target.points-result.totalPoints);
-  if(scoreGap===0 && pointGap===0){
-    return {mode:"already",steps:[],final:{score:result.totalScore,points:result.totalPoints},feasibility:"已達標"};
+  if(!result.complete) return null;
+  const candidates=[];
+  let working={...subjects};
+  const used=new Set();
+  const shortest=target ? getShortestTargetPath(target,result) : null;
+  // For fastest mode, show the mathematically shortest path first. Tie-breaks use
+  // objective gains, then self-assessment, then the official subject order.
+  if(target && strategyGoal==="fastest" && shortest && shortest.length){
+    let state={...subjects};
+    shortest.forEach((step,i)=>{
+      const subject=SUBJECTS.find(s=>s.key===step.subjectKey);
+      candidates.push({...step, order:i, subject:subject.label, strength:subjectStrength[step.subjectKey], reason:`最短達標路徑第 ${i+1} 步；本次＋${step.deltaScore} 積分、＋${step.deltaPoints} 積點。`});
+      state={...state,[step.subjectKey]:step.to};
+    });
+    return {mode:"shortest",steps:candidates,final:{score:shortest.at(-1)?.score ?? result.totalScore,points:shortest.at(-1)?.points ?? result.totalPoints}, shortestLength:shortest.length};
   }
 
-  // 第一輪：只使用符合自評的「建議級」目標。
-  const conservative=buildPlanFromCandidates(target,strategyGoal,"conservative");
-  const conservativeReached=conservative && conservative.score>=target.score && conservative.points>=target.points;
-  if(conservativeReached){
-    const enriched=addPlanReasons(conservative,target);
-    return {...enriched,mode:"conservative",feasibility:"建議級"};
+  // Other goals use a transparent greedy strategy. Recalculate after every step so
+  // the recommendation is cumulative rather than comparing each subject in isolation.
+  let maxRounds=target ? 20 : 5;
+  for(let round=0; round<maxRounds; round++){
+    const current={score:calculateTotalScore(working),points:calculateTotalPoints(working)};
+    if(target && isTargetReached(current.score, current.points, target)) break;
+    const sims=SUBJECTS.map(s=>simulateGradeState(working,s.key)).filter(Boolean);
+    if(!sims.length) break;
+    const ranked=sims.map(sim=>({...sim,rankScore:getStrategyScore(sim,current,target,result)})).sort((a,b)=>b.rankScore-a.rankScore);
+    const pick=ranked[0];
+    const subject=SUBJECTS.find(s=>s.key===pick.subjectKey);
+    const scoreGapBefore=target?Math.max(0,target.score-current.score):0;
+    const pointGapBefore=target?Math.max(0,target.points-current.points):0;
+    const reached=target && isTargetReached(pick.score, pick.points, target);
+    let reason;
+    if(reached) reason=`本次提升直接補足志願門檻；由 ${scoreGapBefore} 分／${pointGapBefore} 點縮小至達標。`;
+    else if(pick.deltaScore>0 && scoreGapBefore>0) reason=`目前積分差距較重要，本次可增加＋${pick.deltaScore} 積分；積點＋${pick.deltaPoints}。`;
+    else if(pick.deltaPoints>0 && pointGapBefore>0) reason=`積分已接近／達標，轉而補積點；本次＋${pick.deltaPoints} 積點。`;
+    else reason=`依「${getStrategyGoalLabel()}」與你的自評排序。`;
+    candidates.push({...pick,order:candidates.length,subject:subject.label,strength:subjectStrength[pick.subjectKey],reason});
+    working={...working,[pick.subjectKey]:pick.to};
+    used.add(pick.subjectKey);
+    // Avoid endlessly upgrading one subject before the learner sees the other subjects.
+    // Once all subjects have been used, a new round is allowed.
+    if(used.size===SUBJECTS.length) used.clear();
   }
-
-  // 第二輪：只有建議級無法達標時，才開放「挑戰級」目標。
-  const stretch=buildPlanFromCandidates(target,strategyGoal,"stretch");
-  const stretchReached=stretch && stretch.score>=target.score && stretch.points>=target.points;
-  if(stretchReached){
-    const enriched=addPlanReasons(stretch,target);
-    return {...enriched,mode:"stretch",feasibility:"挑戰級"};
-  }
-
-  // 即使仍無法達標，也回傳「最佳可行努力組合」，讓學生知道目前能做到哪裡。
-  const fallback=stretch || conservative;
-  if(!fallback) return null;
-  const enriched=addPlanReasons(fallback,target);
-  return {...enriched,mode:"insufficient",feasibility:"目前仍不足"};
+  const final={score:calculateTotalScore(working),points:calculateTotalPoints(working)};
+  return {mode:"greedy",steps:candidates,final,shortestLength:shortest?shortest.length:null};
 }
-
 function getTargetRecommendations(target,result){ return buildPersonalizedStrategy(target,result); }
 
 function renderStrategyPreferences(){
   const box=el("strategyPreferences");
   if(!box) return;
   const labels=[{key:"strong",text:"🟢 強科",cls:"strong"},{key:"normal",text:"🟡 普通",cls:""},{key:"weak",text:"🔴 弱科",cls:"weak"}];
-  const subjectHtml=SUBJECTS.map(s=>`<div class="preference-card"><span class="pref-name">${s.label}</span><div class="preference-options">${labels.map(l=>`<button type="button" class="pref-btn ${l.cls} ${subjectStrength[s.key]===l.key?'active':''}" data-strength-subject="${s.key}" data-strength="${l.key}" aria-pressed="${subjectStrength[s.key]===l.key}">${l.text}</button>`).join('')}</div><small class="pref-cap">${getStrengthProfile(subjectStrength[s.key]).label}：建議上限 ${getStrengthProfile(subjectStrength[s.key]).conservativeCap}</small></div>`).join('');
+  const subjectHtml=SUBJECTS.map(s=>`<div class="preference-card"><span class="pref-name">${s.label}</span><div class="preference-options">${labels.map(l=>`<button type="button" class="pref-btn ${l.cls} ${subjectStrength[s.key]===l.key?'active':''}" data-strength-subject="${s.key}" data-strength="${l.key}" aria-pressed="${subjectStrength[s.key]===l.key}">${l.text}</button>`).join('')}</div></div>`).join('');
   const goals=[
-    ["fastest","🚀 最快達標","以最少科目、最少努力難度達到志願門檻。"],
-    ["balanced","⚖️ 平均提升各科","客觀效益接近時，增加不同科目的提升涵蓋。"],
-    ["weakFirst","🎯 優先突破弱科","客觀結果接近時，才提高弱科的優先度。"],
-    ["safe","🛡️ 最保險策略","達標後優先保留較大的分數／積點餘裕。"]
+    ["fastest","🚀 最快達標","以最少提升步驟達到志願門檻；客觀差距優先。"],
+    ["balanced","⚖️ 平均提升各科","避免只集中單科，兼顧各科成長。"],
+    ["weakFirst","🎯 優先突破弱科","在客觀效益接近時，提高弱科的策略權重。"],
+    ["safe","🛡️ 最保險策略","優先選擇能降低門檻風險、增加餘裕的提升。"]
   ].map(g=>`<label class="goal-option"><input type="radio" name="strategyGoal" value="${g[0]}" ${strategyGoal===g[0]?'checked':''}><span class="goal-label"><b>${g[1]}</b><small>${g[2]}</small></span></label>`).join('');
-  box.innerHTML=`<div style="font-size:.78rem;font-weight:900;color:var(--indigo-deep);">① 我的各科學習狀況</div><div class="preference-grid">${subjectHtml}</div><div class="strategy-note">系統會把自評轉成「可行性資訊」：<b>強科→A++</b>、<b>普通→A+</b>、<b>弱科→A</b>作為保守建議上限。若保守方案無法達標，才會進入挑戰級，不會因為你勾選弱科就硬把弱科排第一。</div><div style="margin-top:14px;font-size:.78rem;font-weight:900;color:var(--indigo-deep);">② 我的目標</div><div class="strategy-goals">${goals}</div><div class="strategy-priority"><strong>系統判斷順序：</strong>志願客觀門檻 ＞ 成績／積點提升效益 ＞ 學習可行性（強弱科） ＞ 國文→數學→英語→社會→自然。<br>每一科只推薦一次「目前等第 → 建議目標等第」，不再把同一科拆成多個小步驟。</div>`;
+  box.innerHTML=`<div style="font-size:.78rem;font-weight:900;color:var(--indigo-deep);">① 我的各科學習狀況</div><div class="preference-grid">${subjectHtml}</div><div style="margin-top:14px;font-size:.78rem;font-weight:900;color:var(--indigo-deep);">② 我的目標</div><div class="strategy-goals">${goals}</div><div class="strategy-priority"><strong>系統判斷順序：</strong>志願目標的重要性 ＞ 成績提升效益 ＞ 你的強弱科 ＞ 國文→數學→英語→社會→自然。<br>因此「弱科」不會永遠排第一；如果某科一次提升能有效補足志願門檻，系統仍會優先推薦它。</div>`;
   box.querySelectorAll('[data-strength-subject]').forEach(btn=>btn.addEventListener('click',()=>{
     subjectStrength[btn.dataset.strengthSubject]=btn.dataset.strength;
     saveSubjects(); renderAll();
@@ -2098,31 +2026,64 @@ function renderTargetSchoolSelector(){
   select.innerHTML='<option value="">請選擇志願學校／科別</option>'+renderTargetSchoolOptions(entries);
   const target=entries.find(e=>e.id===targetSchoolId);
   if(!target){
-    pickedBox.innerHTML='<div class="target-empty">尚未選擇志願。請先選擇目標校系；完成五科成績後，下方會自動出現完整的志願分析與個人化努力路徑。</div>'; resultBox.innerHTML=''; return;
+    pickedBox.innerHTML='<div class="target-empty">尚未選擇志願。請先選擇目標校系；完成五科成績後，下方會自動出現完整的志願分析與努力路徑。</div>'; resultBox.innerHTML=''; return;
   }
-  pickedBox.innerHTML=`<div class="target-selected"><b>目前志願</b><span>${target.school}｜${target.dept}</span><small>歷史參考門檻：${target.score} 分／${target.points} 點　｜　完成五科後，請查看下方個人化分析</small></div>`;
+  const comparisonPrincipleNote='<div class="target-principle-note">📌 比序原則：總積分優先；總積分同分時，才比較總積點。總積分不同時，總積點不會否決前一層已勝出的結果。</div>';
+  pickedBox.innerHTML=`<div class="target-selected"><b>目前志願</b><span>${target.school}｜${target.dept}</span><small>歷史參考門檻：${target.score} 分／${target.points} 點　｜　完成五科後，請直接查看下方分析</small></div>${comparisonPrincipleNote}`;
   const result=getCurrentResult();
   if(!result.complete){
-    resultBox.innerHTML='<div class="target-empty">已選定志願。請完成五科成績，下方將分析「客觀積分差距、積點差距、每科一次到位的個人化努力順序」。</div>'; return;
+    resultBox.innerHTML='<div class="target-empty">已選定志願。請完成五科成績，下方將自動分析「總積分優先、同分才比總積點」的比序結果與個人化努力順序。</div>'; return;
   }
+  // 唯一的中央達標判斷：threshold.reached 由 isTargetReached() 決定，
+  // 全案例（含「30/25 vs 28/30 → 總積分已勝出，金榜題名」）皆以此為準，
+  // 不再使用「總積分 AND 總積點」雙門檻判斷。
   const threshold=compareTargetThreshold(result.totalScore,result.totalPoints,target);
   const cmp=compareAdmissionPosition({totalScore:result.totalScore,totalPoint:result.totalPoints},{score:target.score,points:target.points});
+  if(threshold.reached){
+    let layerNote, scoreCardHtml, pointCardHtml;
+    if(threshold.compareLayer==="score"){
+      // 總積分已高於歷史參考位置：第一層已勝出，總積點不再作為否決條件。
+      layerNote='你的總積分已高於115年歷史參考位置，因此已在第一層比序中勝出；總積點不再作為否決條件。';
+      scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>✓ 已勝出 +${threshold.scoreGap} 分</small></div>`;
+      pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>不需比較</small></div>`;
+    }else{
+      // 總積分同分，且總積點也已達到歷史參考位置。
+      layerNote='總積分同分，且總積點已達到歷史參考位置。';
+      scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>✓ 同分</small></div>`;
+      pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>✓ 已達標${threshold.pointGap>0?`（+${threshold.pointGap} 點）`:''}</small></div>`;
+    }
+    resultBox.innerHTML=`<div class="target-success"><div class="target-icon">🏆</div><div><strong>金榜題名！</strong><span>${target.school}｜${target.dept}</span><small>你的成績：${result.totalScore} 分／${result.totalPoints} 點　｜　歷史門檻：${target.score} 分／${target.points} 點</small><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><small>${layerNote}</small><small>${cmp>=0?'依目前資料比序邏輯也已在歷史參考位置以上。':'實際錄取仍須以當年度招生名額與完整超額比序為準。'}</small></div></div>`;
+    return;
+  }
   const plan=getTargetRecommendations(target,result);
-  const scoreGap=threshold.scoreGap, pointGap=threshold.pointGap;
   const steps=plan?.steps||[];
   const final=plan?.final || {score:result.totalScore,points:result.totalPoints};
-  const achieved=final.score>=target.score && final.points>=target.points;
-  const planHtml=steps.length ? steps.slice(0,5).map((step,i)=>{
-    const isTargetFix=step.reachesBoth;
-    return `<div class="target-plan-step strategy-one-shot"><span class="num">${i+1}</span><div><span class="subject">${step.subject}</span>　<span class="grade">${step.from} → ${step.to}</span><small>自評：${getSubjectStrengthLabel(step.strength)}　<span class="strategy-feasibility ${step.feasibility==='挑戰級'?'stretch':''}">${step.feasibility}</span>${isTargetFix?'<span class="strategy-step-tag">本步達標</span>':''}</small></div><b>＋${step.deltaScore} 分／＋${step.deltaPoints} 點</b><small>完成第 ${i+1} 科後：${step.score} 分／${step.points} 點。${step.reason||''}</small></div>`;
+  const achieved=isTargetReached(final.score, final.points, target);
+  const planHtml=steps.length ? steps.slice(0,12).map((step,i)=>{
+    const subject=SUBJECTS.find(s=>s.key===step.subjectKey);
+    const isTargetFix=target && isTargetReached(step.score, step.points, target);
+    return `<div class="target-plan-step"><span class="num">${i+1}</span><div><span class="subject">${step.subject}</span>　<span class="grade">${step.from} → ${step.to}</span><small>自評：${getSubjectStrengthLabel(subjectStrength[step.subjectKey])}${isTargetFix?'<span class="strategy-step-tag">本步達標</span>':''}</small></div><b>＋${step.deltaScore} 分／＋${step.deltaPoints} 點</b><small>完成第 ${i+1} 步後：${step.score} 分／${step.points} 點。${step.reason||''}</small></div>`;
   }).join('') : '<div class="target-empty">目前不需要再提升即可達到這個歷史參考門檻。</div>';
   const objectiveLine=`目前：${result.totalScore}／${result.totalPoints}　→　歷史參考：${target.score}／${target.points}`;
-  const finalLine=plan?.feasibility==="挑戰級" ? `保守上限下無法完整達標；以下改列「挑戰級」組合，最後可達 ${final.score}／${final.points}。` : plan?.feasibility==="目前仍不足" ? `依目前自評的建議／挑戰上限仍無法完整達標；目前最佳模擬為 ${final.score}／${final.points}。` : `策略模擬：${final.score}／${final.points}${achieved?'　✓ 可達歷史門檻':'　⚠ 依目前自評與可行上限仍不足'}`;
-  const statusTitle=threshold.bothReached?'目前已達歷史參考門檻':'再加油！目前尚未達到歷史參考位置';
-  const statusClass=threshold.bothReached?'target-success':'target-warning';
-  const gapText=threshold.bothReached?'已達標，可用個人化策略增加安全餘裕':'還差 '+scoreGap+' 積分｜'+pointGap+' 積點';
-  const cmpText=cmp>=0?'依目前資料比序邏輯也已在歷史參考位置以上。':'實際錄取仍須以當年度招生名額與完整超額比序為準。';
-  resultBox.innerHTML=`<div class="${statusClass}"><div class="target-warning-head"><strong>${statusTitle}</strong><span>${gapText}</span></div><div class="target-current">你的成績：<b>${result.totalScore} 分／${result.totalPoints} 點</b>　｜　志願門檻：<b>${target.score} 分／${target.points} 點</b></div><div class="target-gap-grid"><div class="target-gap-card"><strong>📈 第一層｜客觀積分</strong><small>${threshold.scoreReached?'已達標':`還差 ${scoreGap} 分`}</small></div><div class="target-gap-card"><strong>🎯 第一層｜客觀積點</strong><small>${threshold.pointReached?'已達標':`還差 ${pointGap} 點`}</small></div></div><div class="target-plan-note"><b>你的策略模式：${getStrategyGoalLabel()}</b><br>${objectiveLine}<br>${finalLine}<br>${cmpText}<br>系統不會因為「弱科」就固定排第一；弱科主要用來判斷達成某個目標等第的難度。</div><h4 style="margin:12px 0 6px;color:var(--indigo-deep);">📚 個人努力優先順序（每科一次到位）</h4>${planHtml}${steps.length>5?'<div class="na-text">以上顯示主要優先科目；每科只會出現一次「目前等第 → 建議目標等第」。</div>':''}<p style="font-size:.72rem;color:#8A6A42;margin:10px 0 0;line-height:1.6;">※ 以上依115年歷史「總積分／總積點」資料進行策略模擬。學生自評只用來估計「學習可行性」，不會改變歷史門檻；「建議級」代表較符合自評，「挑戰級」代表需要明顯跨越目前能力區間，並不代表一定做得到。</p></div>`;
+  const finalLine=`策略模擬：${final.score}／${final.points}${achieved?'　✓ 可達歷史門檻':'　⚠ 目前可提升空間仍不足'}`;
+  // 未達標時的標題與差距文字，只呈現「目前真正具有決定作用的比序層級」，
+  // 依 compareLayer 分成兩種情況：
+  //   score：總積分還沒追上，尚未進入總積點比較。
+  //   point：總積分已同分，正式進入第二層總積點比序。
+  let headline, subline, scoreCardHtml, pointCardHtml;
+  if(threshold.compareLayer==="score"){
+    headline='目前尚未達到歷史參考位置';
+    subline=`第一層總積分還差 ${Math.abs(threshold.scoreGap)} 分。`;
+    scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>還差 ${Math.abs(threshold.scoreGap)} 分</small></div>`;
+    pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>尚未進入比較</small></div>`;
+  }else{
+    headline='總積分同分，因此進入第二層總積點比序';
+    subline=`目前總積點還差 ${Math.abs(threshold.pointGap)} 點。`;
+    scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>✓ 同分</small></div>`;
+    pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>還差 ${Math.abs(threshold.pointGap)} 點</small></div>`;
+  }
+  resultBox.innerHTML=`<div class="target-warning"><div class="target-warning-head"><strong>${headline}</strong><span>${subline}</span></div><div class="target-current">你的成績：<b>${result.totalScore} 分／${result.totalPoints} 點</b>　｜　志願門檻：<b>${target.score} 分／${target.points} 點</b></div><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><div class="target-plan-note"><b>你的策略模式：${getStrategyGoalLabel()}</b><br>${objectiveLine}<br>${finalLine}<br>系統不是「弱科優先」：會先看志願的客觀差距，再看這次提升能增加多少積分／積點，最後才用你的強弱科與單科順序作為微調。</div><h4 style="margin:12px 0 6px;color:var(--indigo-deep);">📚 個人化努力優先順序</h4>${planHtml}${steps.length>12?'<div class="na-text">以上先顯示前12步；系統內部仍以完整可提升空間計算。</div>':''}<p style="font-size:.72rem;color:#8A6A42;margin:10px 0 0;line-height:1.6;">※ 以上是依115年歷史「總積分／總積點」資料進行的策略模擬。學生自評只用來調整「適合你的路徑」，不會改變歷史門檻，也不代表116學年度正式錄取結果。</p></div>`;
+
 }
 
 function renderSubjectCards(){
