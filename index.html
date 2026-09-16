@@ -728,6 +728,9 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
 .strategy-rank-item .rank-reason{display:block;color:var(--ink-soft);font-size:.7rem;line-height:1.45;margin-top:2px;}
 .strategy-rank-item .rank-effect{text-align:right;font-weight:900;color:var(--teal);font-size:.78rem;white-space:nowrap;}
 .strategy-step-tag{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;background:var(--orange-tint);color:#8A5316;font-size:.64rem;font-weight:900;}
+.tag-feasibility{display:inline-block;padding:2px 6px;border-radius:999px;font-size:.64rem;font-weight:900;}
+.tag-recommend{background:var(--teal-tint);color:#075E55;}
+.tag-challenge{background:var(--orange-tint);color:#8A5316;}
 .strategy-comparison{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;}
 .strategy-comparison .compare-cell{background:var(--paper);border-radius:var(--radius-s);padding:8px 10px;}
 .strategy-comparison b{display:block;color:var(--indigo-deep);font-size:.75rem;}.strategy-comparison span{font-size:.8rem;font-weight:900;}
@@ -756,6 +759,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
       ※ 116學年度寫作測驗目前尚未列入積點採計，因此本系統暫不納入計算。系統僅計算國文、數學、英語、社會、自然五科。
     </div>
     <div class="writing-note" id="versionBadge" style="margin-top:10px;"></div>
+    <div class="writing-note" style="margin-top:4px;opacity:.75;">陽明國中・王高帆老師設計</div>
   </div>
 </header>
 
@@ -961,6 +965,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
       <li>部分欄位標示「無人選填」「-」「無開放」，代表無有效最低錄取門檻資料，已排除在門檻比對之外；標示為特殊格式者（如「18--10」）保留原始資料，未自行猜測其意義。</li>
     </ul>
     <p class="fine">本系統不會自動將你的成績上傳或同步至任何伺服器；五科等第僅儲存在你目前使用的瀏覽器（localStorage）。</p>
+    <p class="fine" style="margin-top:6px;opacity:.75;">陽明國中・王高帆老師設計</p>
   </div>
 </footer>
 
@@ -971,7 +976,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
    都從這兩個常數輸出，未來換成116年正式資料時，只需要改這裡。
 ========================= */
 const DATA_YEAR = 115;
-const SYSTEM_VERSION = "3.5";
+const SYSTEM_VERSION = "3.6";
 
 /* =========================
    SCHOOL DATA (raw, transcribed as-is from Kaohsiung_HighSchool_Scores_2026.xlsx)
@@ -1870,6 +1875,10 @@ function getSubjectStrengthWeight(v){ return v==="weak" ? 3 : v==="normal" ? 2 :
 function getStrategyGoalLabel(){
   return ({fastest:"🚀 最快達標", balanced:"⚖️ 平均提升各科", weakFirst:"🎯 優先突破弱科", safe:"🛡️ 最保險策略"})[strategyGoal] || "🚀 最快達標";
 }
+/* NOTE: simulateGradeState()/getNextGrade() remain for the general "提升一級"
+   preview feature (simulateSubjectUpgrade / getUpgradeRanking) only. Personalized
+   strategies (v3.6+) no longer depend on either — that engine now lives in the
+   backend Worker (see worker/src/index.js), called via getTargetRecommendations() below. */
 function simulateGradeState(state, subjectKey){
   const current = state[subjectKey];
   if (!current || current === "A++") return null;
@@ -1886,110 +1895,47 @@ function simulateGradeState(state, subjectKey){
   };
 }
 
-function getShortestTargetPath(target, result){
-  if (!target || !result.complete) return null;
-  if (isTargetReached(result.totalScore, result.totalPoints, target)) return [];
-  const startState = {...subjects};
-  const startKey = stateKey(startState);
-  const queue = [{state:startState, path:[]}];
-  const visited = new Set([startKey]);
-  while(queue.length){
-    const node=queue.shift();
-    for(const s of SUBJECTS){
-      const sim=simulateGradeState(node.state,s.key);
-      if(!sim) continue;
-      const nextState={...node.state,[s.key]:sim.to};
-      const nextPath=[...node.path,sim];
-      if(isTargetReached(sim.score, sim.points, target)) return nextPath;
-      const key=stateKey(nextState);
-      if(!visited.has(key)){ visited.add(key); queue.push({state:nextState,path:nextPath}); }
-    }
-  }
-  return null;
+/* =========================
+   v3.6 → 後端化：個人化策略演算法（單科一次到位候選引擎、BFS 最短路徑、
+   四種策略排序）已搬到 Cloudflare Worker，原始程式碼不再送到使用者瀏覽器。
+   前端只保留：資料顯示用的 isTargetReached/compareTargetThreshold（已在上方定義，
+   極輕量、每一列學校都要立即算一次，不適合也不需要打 API）。
+   -------------------------------------------------------
+   部署步驟見 worker/README.md。部署完成後，請把下面這行換成你自己的 Worker 網址。
+========================= */
+const STRATEGY_API_BASE = "https://kh116-strategy-worker.kaohfan.workers.dev"; // 已接上你部署好的 Cloudflare Worker
+
+const strategyResultCache = new Map(); // 同樣輸入不重複打 API
+
+function strategyCacheKey(target){
+  return JSON.stringify({s:subjects, st:subjectStrength, g:strategyGoal, t:target});
 }
 
-function getStrategyScore(sim, current, target, baseline){
-  const scoreGap=Math.max(0,target ? target.score-current.score : 0);
-  const pointGap=Math.max(0,target ? target.points-current.points : 0);
-  // reachesScore / reachesPoints 僅作為策略評分的輔助加權訊號，
-  // 「是否已達標」一律由 isTargetReached() 這個唯一中央函式決定。
-  const reachesScore=target ? sim.score>=target.score : false;
-  const reachesPoints=target ? sim.points>=target.points : false;
-  const reached=target ? isTargetReached(sim.score, sim.points, target) : false;
-  const subject=SUBJECTS.find(s=>s.key===sim.subjectKey);
-  const idx=SUBJECTS.findIndex(s=>s.key===sim.subjectKey);
-  const strength=getSubjectStrengthWeight(subjectStrength[sim.subjectKey]);
-  const deltaNewScore=sim.deltaScore;
-  const deltaNewPoints=sim.deltaPoints;
-  let score=0;
-  // Objective target layer: the dominant component.
-  if(target){
-    if(reached) score+=10000;
-    if(reachesScore) score+=3500;
-    if(reachesPoints) score+=1800;
-    score+=Math.min(1200, Math.max(0, deltaNewScore)*420);
-    score+=Math.min(600, Math.max(0, deltaNewPoints)*120);
-    score-=Math.min(700, Math.max(0, scoreGap)*35);
-    score-=Math.min(500, Math.max(0, pointGap)*18);
-  }else{
-    score += deltaNewScore*420 + deltaNewPoints*120;
-  }
-  // Goal-specific layer, intentionally smaller than objective target effect.
-  if(strategyGoal==="fastest") score += (reached ? 900 : 0) - idx*2;
-  if(strategyGoal==="balanced") score += (6-strength)*45 - idx*2;
-  if(strategyGoal==="weakFirst") score += strength*115 - idx*2;
-  if(strategyGoal==="safe") score += (reached?500:0) + Math.min(300,deltaNewScore*80+deltaNewPoints*30) - idx*2;
-  return score;
-}
-
-function buildPersonalizedStrategy(target,result){
-  if(!result.complete) return null;
-  const candidates=[];
-  let working={...subjects};
-  const used=new Set();
-  const shortest=target ? getShortestTargetPath(target,result) : null;
-  // For fastest mode, show the mathematically shortest path first. Tie-breaks use
-  // objective gains, then self-assessment, then the official subject order.
-  if(target && strategyGoal==="fastest" && shortest && shortest.length){
-    let state={...subjects};
-    shortest.forEach((step,i)=>{
-      const subject=SUBJECTS.find(s=>s.key===step.subjectKey);
-      candidates.push({...step, order:i, subject:subject.label, strength:subjectStrength[step.subjectKey], reason:`最短達標路徑第 ${i+1} 步；本次＋${step.deltaScore} 積分、＋${step.deltaPoints} 積點。`});
-      state={...state,[step.subjectKey]:step.to};
+// 呼叫後端策略 API。回傳 {mode, steps, final, shortestLength, alreadyReached}，
+// 或在失敗時回傳 {error:true, message}，由呼叫端決定如何顯示。
+async function getTargetRecommendations(target, result){
+  if(!result || !result.complete) return null;
+  const key = strategyCacheKey(target);
+  if(strategyResultCache.has(key)) return strategyResultCache.get(key);
+  try{
+    const res = await fetch(`${STRATEGY_API_BASE}/api/strategy`, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ subjects, subjectStrength, target, strategyGoal })
     });
-    return {mode:"shortest",steps:candidates,final:{score:shortest.at(-1)?.score ?? result.totalScore,points:shortest.at(-1)?.points ?? result.totalPoints}, shortestLength:shortest.length};
+    let body;
+    try{ body = await res.json(); }catch(_e){ body = null; }
+    if(!res.ok || !body || !body.ok){
+      const message = (body && body.message) || `策略伺服器回應異常（${res.status}）。`;
+      throw new Error(message);
+    }
+    strategyResultCache.set(key, body.result);
+    return body.result;
+  }catch(err){
+    console.error("策略 API 呼叫失敗：", err);
+    return { error:true, message: (err && err.message) || "無法連線到策略伺服器，請確認網路連線後再試一次。" };
   }
-
-  // Other goals use a transparent greedy strategy. Recalculate after every step so
-  // the recommendation is cumulative rather than comparing each subject in isolation.
-  let maxRounds=target ? 20 : 5;
-  for(let round=0; round<maxRounds; round++){
-    const current={score:calculateTotalScore(working),points:calculateTotalPoints(working)};
-    if(target && isTargetReached(current.score, current.points, target)) break;
-    const sims=SUBJECTS.map(s=>simulateGradeState(working,s.key)).filter(Boolean);
-    if(!sims.length) break;
-    const ranked=sims.map(sim=>({...sim,rankScore:getStrategyScore(sim,current,target,result)})).sort((a,b)=>b.rankScore-a.rankScore);
-    const pick=ranked[0];
-    const subject=SUBJECTS.find(s=>s.key===pick.subjectKey);
-    const scoreGapBefore=target?Math.max(0,target.score-current.score):0;
-    const pointGapBefore=target?Math.max(0,target.points-current.points):0;
-    const reached=target && isTargetReached(pick.score, pick.points, target);
-    let reason;
-    if(reached) reason=`本次提升直接補足志願門檻；由 ${scoreGapBefore} 分／${pointGapBefore} 點縮小至達標。`;
-    else if(pick.deltaScore>0 && scoreGapBefore>0) reason=`目前積分差距較重要，本次可增加＋${pick.deltaScore} 積分；積點＋${pick.deltaPoints}。`;
-    else if(pick.deltaPoints>0 && pointGapBefore>0) reason=`積分已接近／達標，轉而補積點；本次＋${pick.deltaPoints} 積點。`;
-    else reason=`依「${getStrategyGoalLabel()}」與你的自評排序。`;
-    candidates.push({...pick,order:candidates.length,subject:subject.label,strength:subjectStrength[pick.subjectKey],reason});
-    working={...working,[pick.subjectKey]:pick.to};
-    used.add(pick.subjectKey);
-    // Avoid endlessly upgrading one subject before the learner sees the other subjects.
-    // Once all subjects have been used, a new round is allowed.
-    if(used.size===SUBJECTS.length) used.clear();
-  }
-  const final={score:calculateTotalScore(working),points:calculateTotalPoints(working)};
-  return {mode:"greedy",steps:candidates,final,shortestLength:shortest?shortest.length:null};
 }
-function getTargetRecommendations(target,result){ return buildPersonalizedStrategy(target,result); }
 
 function renderStrategyPreferences(){
   const box=el("strategyPreferences");
@@ -2011,6 +1957,9 @@ function renderStrategyPreferences(){
     strategyGoal=r.value; saveSubjects(); renderAll();
   }));
 }
+
+let strategyRequestSeq = 0; // 用來忽略「使用者已經切換志願/策略」後才回來的舊回應。
+const STRATEGY_LOADING_HTML = '<div class="target-empty">🔄 正在向策略伺服器計算個人化建議…</div>';
 
 function renderTargetSchoolSelector(){
   const select=el("targetSchoolSelect"), pickedBox=el("targetSchoolPicked"), resultBox=el("targetSchoolResult");
@@ -2034,11 +1983,29 @@ function renderTargetSchoolSelector(){
   if(!result.complete){
     resultBox.innerHTML='<div class="target-empty">已選定志願。請完成五科成績，下方將自動分析「總積分優先、同分才比總積點」的比序結果與個人化努力順序。</div>'; return;
   }
-  // 唯一的中央達標判斷：threshold.reached 由 isTargetReached() 決定，
-  // 全案例（含「30/25 vs 28/30 → 總積分已勝出，金榜題名」）皆以此為準，
-  // 不再使用「總積分 AND 總積點」雙門檻判斷。
+  // 唯一的中央達標判斷：threshold.reached 由 isTargetReached() 決定（純前端、極輕量、
+  // 每一列學校都要立即算一次，因此不搬到後端）。全案例（含「30/25 vs 28/30 → 總積分已勝出，
+  // 金榜題名」）皆以此為準，不再使用「總積分 AND 總積點」雙門檻判斷。
   const threshold=compareTargetThreshold(result.totalScore,result.totalPoints,target);
   const cmp=compareAdmissionPosition({totalScore:result.totalScore,totalPoint:result.totalPoints},{score:target.score,points:target.points});
+
+  // 單一 plan-step 渲染函式：不論「已達標找安全餘裕」或「尚未達標找路徑」都共用同一段 UI，
+  // 並加上 v3.6 新增的 🟢建議級／🟠挑戰級／🏆本步達標 標示。
+  function renderPlanStepHtml(step, i){
+    const isTargetFix = target && isTargetReached(step.score, step.points, target);
+    const feasibilityTag = step.isChallenge
+      ? '<span class="tag-feasibility tag-challenge">🟠 挑戰級</span>'
+      : '<span class="tag-feasibility tag-recommend">🟢 建議級</span>';
+    const feasibilityNote = step.isChallenge
+      ? '需要明顯跨越目前自評能力區間，不代表一定做得到。'
+      : '符合目前自評的學習狀況。';
+    return `<div class="target-plan-step"><span class="num">${i+1}</span><div><span class="subject">${step.subject}</span>　<span class="grade">${step.from} → ${step.to}</span>　${feasibilityTag}${isTargetFix?'<span class="strategy-step-tag">🏆 本步達標</span>':''}<small>自評：${getSubjectStrengthLabel(subjectStrength[step.subjectKey])}｜${feasibilityNote}</small></div><b>＋${step.deltaScore} 分／＋${step.deltaPoints} 點</b><small>完成第 ${i+1} 步後：${step.score} 分／${step.points} 點。${step.reason||''}</small></div>`;
+  }
+
+  // 策略計算現在要打後端 API，屬於非同步。先把「達標與否」的畫面立即顯示（純前端、零延遲），
+  // 個人化策略區先放一個載入中提示，回應回來後再填入——不讓網路延遲卡住整個志願分析畫面。
+  const mySeq = ++strategyRequestSeq;
+
   if(threshold.reached){
     let layerNote, scoreCardHtml, pointCardHtml;
     if(threshold.compareLayer==="score"){
@@ -2052,20 +2019,32 @@ function renderTargetSchoolSelector(){
       scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>✓ 同分</small></div>`;
       pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>✓ 已達標${threshold.pointGap>0?`（+${threshold.pointGap} 點）`:''}</small></div>`;
     }
-    resultBox.innerHTML=`<div class="target-success"><div class="target-icon">🏆</div><div><strong>金榜題名！</strong><span>${target.school}｜${target.dept}</span><small>你的成績：${result.totalScore} 分／${result.totalPoints} 點　｜　歷史門檻：${target.score} 分／${target.points} 點</small><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><small>${layerNote}</small><small>${cmp>=0?'依目前資料比序邏輯也已在歷史參考位置以上。':'實際錄取仍須以當年度招生名額與完整超額比序為準。'}</small></div></div>`;
+    // v3.6：已達標學生不再隱藏個人化策略區，改為「增加安全餘裕」的策略模擬。
+    resultBox.innerHTML=`<div class="target-success"><div class="target-icon">🏆</div><div><strong>金榜題名！</strong><span>${target.school}｜${target.dept}</span><small>你的成績：${result.totalScore} 分／${result.totalPoints} 點　｜　歷史門檻：${target.score} 分／${target.points} 點</small><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><small>${layerNote}</small><small>${cmp>=0?'依目前資料比序邏輯也已在歷史參考位置以上。':'實際錄取仍須以當年度招生名額與完整超額比序為準。'}</small></div></div><div class="target-plan-note"><b>🏆 目前已達歷史參考門檻，可用個人化策略增加安全餘裕。</b><br>你的策略模式：${getStrategyGoalLabel()}</div><h4 style="margin:12px 0 6px;color:var(--indigo-deep);">📚 個人化努力優先順序（安全餘裕）</h4><div id="strategyPlanSlot">${STRATEGY_LOADING_HTML}</div>`;
+
+    // 🚀最快達標＋已達標，答案永遠是「0步」，這是純數學事實（isTargetReached 已經為 true），
+    // 不需要為了顯示這句話特地打一次 API。
+    if(strategyGoal==="fastest"){
+      const slot=resultBox.querySelector('#strategyPlanSlot');
+      if(slot) slot.innerHTML='<div class="target-empty">🚀 已達標，最快達標路徑為 0 步；不需要再提升任何一科。</div>';
+      return;
+    }
+    getTargetRecommendations(target,result).then(plan=>{
+      if(mySeq!==strategyRequestSeq) return; // 使用者已切換志願／策略，這次回應作廢
+      const slot=resultBox.querySelector('#strategyPlanSlot');
+      if(!slot) return;
+      if(plan && plan.error){
+        slot.innerHTML=`<div class="target-empty">⚠️ 策略伺服器暫時無法回應：${plan.message}</div>`;
+        return;
+      }
+      const steps=(plan && plan.steps) || [];
+      slot.innerHTML = steps.length
+        ? steps.slice(0,12).map((step,i)=>renderPlanStepHtml(step,i)).join('')
+        : '<div class="target-empty">目前沒有更進一步能提升安全餘裕的合理方案（可能已接近各科自評上限）。</div>';
+    });
     return;
   }
-  const plan=getTargetRecommendations(target,result);
-  const steps=plan?.steps||[];
-  const final=plan?.final || {score:result.totalScore,points:result.totalPoints};
-  const achieved=isTargetReached(final.score, final.points, target);
-  const planHtml=steps.length ? steps.slice(0,12).map((step,i)=>{
-    const subject=SUBJECTS.find(s=>s.key===step.subjectKey);
-    const isTargetFix=target && isTargetReached(step.score, step.points, target);
-    return `<div class="target-plan-step"><span class="num">${i+1}</span><div><span class="subject">${step.subject}</span>　<span class="grade">${step.from} → ${step.to}</span><small>自評：${getSubjectStrengthLabel(subjectStrength[step.subjectKey])}${isTargetFix?'<span class="strategy-step-tag">本步達標</span>':''}</small></div><b>＋${step.deltaScore} 分／＋${step.deltaPoints} 點</b><small>完成第 ${i+1} 步後：${step.score} 分／${step.points} 點。${step.reason||''}</small></div>`;
-  }).join('') : '<div class="target-empty">目前不需要再提升即可達到這個歷史參考門檻。</div>';
-  const objectiveLine=`目前：${result.totalScore}／${result.totalPoints}　→　歷史參考：${target.score}／${target.points}`;
-  const finalLine=`策略模擬：${final.score}／${final.points}${achieved?'　✓ 可達歷史門檻':'　⚠ 目前可提升空間仍不足'}`;
+
   // 未達標時的標題與差距文字，只呈現「目前真正具有決定作用的比序層級」，
   // 依 compareLayer 分成兩種情況：
   //   score：總積分還沒追上，尚未進入總積點比較。
@@ -2082,8 +2061,24 @@ function renderTargetSchoolSelector(){
     scoreCardHtml=`<div class="target-gap-card"><strong>📈 第一層｜總積分</strong><small>✓ 同分</small></div>`;
     pointCardHtml=`<div class="target-gap-card"><strong>🎯 第二層｜總積點</strong><small>還差 ${Math.abs(threshold.pointGap)} 點</small></div>`;
   }
-  resultBox.innerHTML=`<div class="target-warning"><div class="target-warning-head"><strong>${headline}</strong><span>${subline}</span></div><div class="target-current">你的成績：<b>${result.totalScore} 分／${result.totalPoints} 點</b>　｜　志願門檻：<b>${target.score} 分／${target.points} 點</b></div><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><div class="target-plan-note"><b>你的策略模式：${getStrategyGoalLabel()}</b><br>${objectiveLine}<br>${finalLine}<br>系統不是「弱科優先」：會先看志願的客觀差距，再看這次提升能增加多少積分／積點，最後才用你的強弱科與單科順序作為微調。</div><h4 style="margin:12px 0 6px;color:var(--indigo-deep);">📚 個人化努力優先順序</h4>${planHtml}${steps.length>12?'<div class="na-text">以上先顯示前12步；系統內部仍以完整可提升空間計算。</div>':''}<p style="font-size:.72rem;color:#8A6A42;margin:10px 0 0;line-height:1.6;">※ 以上是依115年歷史「總積分／總積點」資料進行的策略模擬。學生自評只用來調整「適合你的路徑」，不會改變歷史門檻，也不代表116學年度正式錄取結果。</p></div>`;
+  resultBox.innerHTML=`<div class="target-warning"><div class="target-warning-head"><strong>${headline}</strong><span>${subline}</span></div><div class="target-current">你的成績：<b>${result.totalScore} 分／${result.totalPoints} 點</b>　｜　志願門檻：<b>${target.score} 分／${target.points} 點</b></div><div class="target-gap-grid">${scoreCardHtml}${pointCardHtml}</div><div id="strategyPlanSlot">${STRATEGY_LOADING_HTML}</div></div>`;
 
+  getTargetRecommendations(target,result).then(plan=>{
+    if(mySeq!==strategyRequestSeq) return; // 使用者已切換志願／策略，這次回應作廢
+    const slot=resultBox.querySelector('#strategyPlanSlot');
+    if(!slot) return;
+    if(plan && plan.error){
+      slot.innerHTML=`<div class="target-empty">⚠️ 策略伺服器暫時無法回應：${plan.message}<br>請稍後重新整理再試一次。</div>`;
+      return;
+    }
+    const steps=(plan && plan.steps) || [];
+    const final=(plan && plan.final) || {score:result.totalScore,points:result.totalPoints};
+    const achieved=isTargetReached(final.score, final.points, target);
+    const planHtml=steps.length ? steps.slice(0,12).map((step,i)=>renderPlanStepHtml(step,i)).join('') : '<div class="target-empty">目前不需要再提升即可達到這個歷史參考門檻。</div>';
+    const objectiveLine=`目前：${result.totalScore}／${result.totalPoints}　→　歷史參考：${target.score}／${target.points}`;
+    const finalLine=`策略模擬：${final.score}／${final.points}${achieved?'　✓ 可達歷史門檻':'　⚠ 目前可提升空間仍不足'}`;
+    slot.innerHTML=`<div class="target-plan-note"><b>你的策略模式：${getStrategyGoalLabel()}</b><br>${objectiveLine}<br>${finalLine}<br>系統不是「弱科優先」：會先看志願的客觀差距，再看這次提升能增加多少積分／積點，最後才用你的強弱科與單科順序作為微調。</div><h4 style="margin:12px 0 6px;color:var(--indigo-deep);">📚 個人化努力優先順序</h4>${planHtml}${steps.length>12?'<div class="na-text">以上先顯示前12步；系統內部仍以完整可提升空間計算。</div>':''}<p style="font-size:.72rem;color:#8A6A42;margin:10px 0 0;line-height:1.6;">※ 以上是依115年歷史「總積分／總積點」資料進行的策略模擬。學生自評只用來調整「適合你的路徑」，不會改變歷史門檻，也不代表116學年度正式錄取結果。</p>`;
+  });
 }
 
 function renderSubjectCards(){
