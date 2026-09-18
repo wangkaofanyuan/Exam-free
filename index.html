@@ -967,6 +967,7 @@ footer .fine{font-size:.78rem; color:#8B92C0;}
     <p class="fine">本系統不會自動將你的成績上傳或同步至任何伺服器；五科等第僅儲存在你目前使用的瀏覽器（localStorage）。</p>
     <p class="fine" style="margin-top:6px;opacity:.75;">陽明國中・王高帆老師設計</p>
     <p class="fine" style="margin-top:4px;opacity:.75;">© 2026 陽明國中 王高帆．保留所有權利．未經授權不得重製或改作。</p>
+    <p class="fine" id="visitCounter" style="margin-top:4px;opacity:.6;"></p>
   </div>
 </footer>
 
@@ -1938,6 +1939,31 @@ async function getTargetRecommendations(target, result){
   }
 }
 
+/* =========================
+   瀏覽／使用人數計數器
+   -------------------------------------------------------
+   同一次瀏覽（同一個分頁的 sessionStorage 存活期間）只會累加一次，
+   重新整理頁面不會重複灌水；換一個瀏覽器分頁或關掉再打開才會再算一次。
+   讀取失敗（例如尚未在 Worker 綁定 KV，或離線）時安靜隱藏，不影響其他功能。
+========================= */
+const VISIT_SESSION_FLAG = "kh116_visit_counted_v1";
+
+async function initVisitCounter(){
+  const el = document.getElementById("visitCounter");
+  if(!el) return;
+  try{
+    const alreadyCountedThisSession = sessionStorage.getItem(VISIT_SESSION_FLAG) === "1";
+    const res = await fetch(`${STRATEGY_API_BASE}/api/visit`, { method: alreadyCountedThisSession ? "GET" : "POST" });
+    const body = await res.json();
+    if(!res.ok || !body || !body.ok) throw new Error("visit counter unavailable");
+    if(!alreadyCountedThisSession) sessionStorage.setItem(VISIT_SESSION_FLAG, "1");
+    el.textContent = `👀 累計瀏覽人次：${body.count.toLocaleString("zh-Hant-TW")}`;
+  }catch(err){
+    // 計數器是錦上添花的功能，任何原因失敗都不影響系統其他功能，安靜跳過即可。
+    el.textContent = "";
+  }
+}
+
 function renderStrategyPreferences(){
   const box=el("strategyPreferences");
   if(!box) return;
@@ -2581,6 +2607,7 @@ function init(){
   populateCategoryFilter();
   initEventHandlers();
   renderAll();
+  initVisitCounter();
 }
 document.addEventListener("DOMContentLoaded", init);
 </script>
